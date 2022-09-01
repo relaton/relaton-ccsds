@@ -20,4 +20,3 @@ jobs:
       next_version: ${{ github.event.inputs.next_version }}
     secrets:
       rubygems-api-key: ${{ secrets.RELATON_CI_RUBYGEMS_API_KEY }}
-
