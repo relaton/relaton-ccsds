@@ -3,32 +3,25 @@
 require_relative "lib/relaton_ccsds/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "relaton-ccsds"
-  spec.version = Relaton::Ccsds::VERSION
-  spec.authors = ["Alexande B."]
-  spec.email = ["abobrikovich@gmail.com"]
+  spec.name         = "relaton-ccsds"
+  spec.version      = Relaton::Ccsds::VERSION
+  spec.authors      = ["Ribose Inc."]
+  spec.email        = ["open.source@ribose.com"]
 
-  spec.summary = "TODO: Write a short summary, because RubyGems requires one."
-  spec.description = "TODO: Write a longer description or delete this line."
-  spec.homepage = "TODO: Put your gem's website or public repo URL here."
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.summary      = "RelatonCcsds: retrive www.ccsds.org Standards"
+  spec.description  = "RelatonCcsds: retrive www.ccsds.org Standards"
+  spec.homepage     = "https://github.com/metanorma/relaton-ccsds"
+  spec.license      = "MIT"
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
-
-  spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
-  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
-
-  # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  spec.files = Dir.chdir(__dir__) do
+  spec.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`.split("\x0").reject do |f|
-      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
+      f.match(%r{^(test|spec|features)/})
     end
   end
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.required_ruby_version = ">= 2.6.0"
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
