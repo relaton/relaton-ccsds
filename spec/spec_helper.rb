@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "relaton/ccsds"
+require "relaton_ccsds"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
