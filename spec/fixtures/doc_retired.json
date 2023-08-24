@@ -1,0 +1,34 @@
+{
+  "__metadata": {
+      "id": "c979c092-0180-4266-9fe9-572e37ba0768",
+      "uri": "https://public.ccsds.org/_api/Web/Lists(guid'867cc153-c4fe-4692-b3a3-4bb0e2107538')/Items(1)",
+      "etag": "\"7\"",
+      "type": "SP.Data.PubsItem"
+  },
+  "Document_x0020_Number": "CCSDS 211.0-B-5-S",
+  "Dcoument_x0020_Title": "Proximity-1 Space Link Protocol--Data Link Layer",
+  "Book_x0020_Type": "Silver Book",
+  "Description0": "The CCSDS Recommended Standard for Proximity-1 Space Link Protocol—Data Link Layer specifies the protocol, services, and procedures pertaining to the CCSDS Version-3 Transfer Frame.  The current issue includes several improvements and clarifications—accomplishing better alignment and consistency with the other Proximity-1 Blue Books—and the addition of an option for Low Density Parity-Check (LDPC) codes.",
+  "Issue_x0020_Number": "5",
+  "ISO_x0020_Number": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "ISO Equivalent : 22663",
+      "Url": "https://www.iso.org/standard/67091.html?browse=tc"
+  },
+  "Patents": null,
+  "Extra_x0020_Link": null,
+  "Working_x0020_Group": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "SLS-SLP",
+      "Url": "https://cwe.ccsds.org/sls/default.aspx#_SLS-SLP"
+  },
+  "Area": "None",
+  "calHtmlColorCode": "#808080",
+  "calPublishedMonth": "December",
+  "calPublishedYear": "2013",
+  "FileRef": "/Pubs/211x0b5s.pdf"
+}

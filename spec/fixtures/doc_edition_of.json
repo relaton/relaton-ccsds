@@ -1,0 +1,29 @@
+{
+  "__metadata": {
+      "id": "b25dc1da-4b3d-4f26-914f-8dd78a52325b",
+      "uri": "https://public.ccsds.org/_api/Web/Lists(guid'867cc153-c4fe-4692-b3a3-4bb0e2107538')/Items(455)",
+      "etag": "\"5\"",
+      "type": "SP.Data.PubsItem"
+  },
+  "Document_x0020_Number": "CCSDS 123.0-B-2 Cor. 2",
+  "Dcoument_x0020_Title": "Technical Corrigendum 2 to CCSDS 123.0-B-2, Issued February 2019",
+  "Book_x0020_Type": "Blue Book",
+  "Description0": "This Technical Corrigendum documents changes to CCSDS 123.0-B-2, Low-Complexity Lossless and Near-Lossless Multispectral and Hyperspectral Image Compression (Blue Book, Issue 2, February 2019).",
+  "Issue_x0020_Number": "2 Cor. 2",
+  "ISO_x0020_Number": null,
+  "Patents": null,
+  "Extra_x0020_Link": null,
+  "Working_x0020_Group": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "SLS-MHDC",
+      "Url": "https://cwe.ccsds.org/sls/default.aspx#_SLS-MHDC"
+  },
+  "Area": "SLS",
+  "calActive": "Active",
+  "calHtmlColorCode": "#0066FF",
+  "calPublishedMonth": "August",
+  "calPublishedYear": "2020",
+  "FileRef": "/Pubs/123x0b2c2_tc2023.pdf"
+}

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
+
 require "relaton_ccsds"
 
 RSpec.configure do |config|
@@ -12,4 +14,6 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.expose_dsl_globally = true
 end

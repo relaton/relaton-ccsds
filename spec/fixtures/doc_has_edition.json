@@ -1,0 +1,35 @@
+{
+  "__metadata": {
+      "id": "fc3bf219-4cd2-43c4-9891-dd602e43d557",
+      "uri": "https://public.ccsds.org/_api/Web/Lists(guid'867cc153-c4fe-4692-b3a3-4bb0e2107538')/Items(416)",
+      "etag": "\"12\"",
+      "type": "SP.Data.PubsItem"
+  },
+  "Document_x0020_Number": "CCSDS 123.0-B-2",
+  "Dcoument_x0020_Title": "Low-Complexity Lossless and Near-Lossless  Multispectral and Hyperspectral Image Compression",
+  "Book_x0020_Type": "Blue Book",
+  "Description0": "The Recommended Standard for multispectral and hyperspectral image compression specifies a data compression algorithm applied to digital three-dimensional image data from payload instruments, such as multispectral and hyperspectral imagers. Lossless and near-lossless methods are specified, along with a format for storing the compressed data.  The current version of this document contains all updates through technical corrigendum 3, dated February 2021. ",
+  "Issue_x0020_Number": "2",
+  "ISO_x0020_Number": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "ISO Equivalent : 18381",
+      "Url": "https://www.iso.org/standard/62319.html?browse=tc"
+  },
+  "Patents": null,
+  "Extra_x0020_Link": null,
+  "Working_x0020_Group": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "SLS-MHDC",
+      "Url": "https://cwe.ccsds.org/sls/default.aspx#_SLS-MHDC"
+  },
+  "Area": "SLS",
+  "calActive": "Active",
+  "calHtmlColorCode": "#0066FF",
+  "calPublishedMonth": "February",
+  "calPublishedYear": "2019",
+  "FileRef": "/Pubs/123x0b2c3.pdf"
+}
