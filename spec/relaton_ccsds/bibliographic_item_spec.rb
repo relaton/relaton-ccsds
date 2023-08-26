@@ -52,6 +52,12 @@ describe RelatonCcsds::BibliographicItem do
         item = described_class.new title: [title: "title"]
         expect(item.to_hash).not_to have_key "ext"
       end
+
+      it "render doc" do
+        hash = YAML.load_file "spec/fixtures/ccsds_230_2-g-1.yaml"
+        bib  = RelatonCcsds::BibliographicItem.from_hash hash
+        expect(bib.to_hash).to eq hash
+      end
     end
   end
 end

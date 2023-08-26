@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-module Relaton
-  module Ccsds
-    VERSION = "0.1.0"
-  end
+module RelatonCcsds
+  VERSION = "1.14.0"
 end

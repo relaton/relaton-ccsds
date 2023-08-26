@@ -8,10 +8,12 @@ require_relative "relaton_ccsds/bibliographic_item"
 require_relative "relaton_ccsds/config"
 require_relative "relaton_ccsds/util"
 require_relative "relaton_ccsds/bibliography"
+require_relative "relaton_ccsds/hit"
 require_relative "relaton_ccsds/hit_collection"
 require_relative "relaton_ccsds/data_fetcher"
 require_relative "relaton_ccsds/data_parser"
 require_relative "relaton_ccsds/hash_converter"
+require_relative "relaton_ccsds/xml_parser"
 
 module RelatonCcsds
   class Error < StandardError; end

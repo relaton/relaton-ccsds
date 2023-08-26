@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe Relaton::Ccsds do
+RSpec.describe RelatonCcsds do
   it "has a version number" do
-    expect(Relaton::Ccsds::VERSION).not_to be nil
+    expect(RelatonCcsds::VERSION).not_to be nil
   end
 
   it "returns grammar hash" do

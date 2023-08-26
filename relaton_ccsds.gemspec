@@ -4,7 +4,7 @@ require_relative "lib/relaton_ccsds/version"
 
 Gem::Specification.new do |spec|
   spec.name         = "relaton-ccsds"
-  spec.version      = Relaton::Ccsds::VERSION
+  spec.version      = RelatonCcsds::VERSION
   spec.authors      = ["Ribose Inc."]
   spec.email        = ["open.source@ribose.com"]
 
