@@ -195,6 +195,8 @@ describe RelatonCcsds::DataFetcher do
       before do
         expect(YAML).to receive(:load_file).with("file.yaml").and_return :hash
         expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(:hash).and_return inst
+        expect(inst).to receive(:to_bibxml).and_return :xml
+        expect(File).to receive(:write).with("file.yaml", :xml, encoding: "UTF-8")
       end
 
       context "translation" do
@@ -223,6 +225,8 @@ describe RelatonCcsds::DataFetcher do
       expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(:hash).and_return :inst
       expect(subject).to receive(:create_relation).with(:bib, :inst, "hasInstance")
       expect(subject).to receive(:create_relation).with(:inst, :bib, "instanceOf")
+      expect(subject).to receive(:content).with(:inst).and_return :content
+      expect(File).to receive(:write).with("file.yaml", :content, encoding: "UTF-8")
       subject.create_instance_relation :bib, "file.yaml"
     end
 

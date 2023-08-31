@@ -69,15 +69,14 @@ module RelatonCcsds
       save_bib bibitem
     end
 
-    def save_bib(bib) # rubocop:disable Metrics/MethodLength
+    def save_bib(bib)
       search_translation bib
       id = bib.docidentifier.first.id
       file = File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
-      if @files.include? file
+      if @files.include?(file)
         puts "(#{file}) file already exists. Trying to merge links ..."
         merge_links bib, file
-      else
-        @files << file
+      else @files << file
       end
       File.write file, content(bib), encoding: "UTF-8"
       index.add_or_update id, file
@@ -101,7 +100,7 @@ module RelatonCcsds
       end
     end
 
-    def create_translation_relation(bib, file)
+    def create_translation_relation(bib, file) # rubocop:disable Metrics/MethodLength
       hash = YAML.load_file file
       inst = BibliographicItem.from_hash hash
       if inst.docidentifier.first.id.match?(TRRGX)
@@ -112,6 +111,7 @@ module RelatonCcsds
       end
       create_relation(bib, inst, type1)
       create_relation(inst, bib, type2)
+      File.write file, content(inst), encoding: "UTF-8"
     end
 
     def create_instance_relation(bib, file)
@@ -119,6 +119,7 @@ module RelatonCcsds
       inst = BibliographicItem.from_hash hash
       create_relation bib, inst, "hasInstance"
       create_relation inst, bib, "instanceOf"
+      File.write file, content(inst), encoding: "UTF-8"
     end
 
     def create_relation(bib1, bib2, type)

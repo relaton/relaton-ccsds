@@ -54,7 +54,7 @@ module RelatonCcsds
     # Remove index file
     #
     def remove_index_file
-      Relaton::Index.find_or_create(:CC, url: true, file: HitCollection::INDEX_FILE).remove_file
+      Relaton::Index.find_or_create(:ccsds, url: true, file: HitCollection::INDEX_FILE).remove_file
     end
   end
 end
