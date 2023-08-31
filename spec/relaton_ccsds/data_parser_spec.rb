@@ -108,8 +108,11 @@ describe RelatonCcsds::DataParser do
       expect(link.first.content.to_s).to eq "https://public.ccsds.org/Pubs/121x0b3.pdf"
     end
 
-    it "#parse_edition" do
-      expect(subject.parse_edition).to eq "3"
+    context "#parse_edition" do
+      let(:doc) { JSON.parse File.read "spec/fixtures/doc_edition_of.json" }
+      it do
+        expect(subject.parse_edition).to eq "2"
+      end
     end
 
     context "#parse_relation" do
@@ -126,7 +129,7 @@ describe RelatonCcsds::DataParser do
         expect(relation[0]).to be_instance_of RelatonBib::DocumentRelation
         expect(relation[0].type).to eq "adoptedAs"
         expect(relation[1]).to be_instance_of RelatonBib::DocumentRelation
-        expect(relation[1].type).to eq "hasEdition"
+        expect(relation[1].type).to eq "updatedBy"
         expect(relation[1].bibitem.id).to eq "CCSDS123.0-B-2Cor.2"
       end
     end
@@ -158,7 +161,7 @@ describe RelatonCcsds::DataParser do
         end
 
         it { expect(subject.relation_type(doc["Document_x0020_Number"])).to be_nil }
-        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "hasEdition" }
+        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "updatedBy" }
       end
 
       context "editionOf" do
@@ -168,7 +171,7 @@ describe RelatonCcsds::DataParser do
           [doc, doc_has_edition]
         end
 
-        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "editionOf" }
+        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "updates" }
       end
 
       it "one ID is translation" do
@@ -178,7 +181,7 @@ describe RelatonCcsds::DataParser do
 
       it "both IDs are translations" do
         expect(subject).to receive(:docidentifier).and_return("CCSDS 650.0-B-1 - French Translated").exactly(3).times
-        expect(subject.relation_type("CCSDS 650.0-B-1-S - French Translated")).to eq "hasEdition"
+        expect(subject.relation_type("CCSDS 650.0-B-1-S - French Translated")).to eq "updatedBy"
       end
     end
 

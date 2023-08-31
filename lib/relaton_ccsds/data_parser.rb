@@ -76,7 +76,7 @@ module RelatonCcsds
     end
 
     def parse_edition
-      @doc["Issue_x0020_Number"]
+      @doc["Issue_x0020_Number"].match(/^\d+/)&.to_s
     end
 
     def parse_relation
@@ -105,13 +105,13 @@ module RelatonCcsds
     end
 
     def relation_type(rel_id)
-      tr_rgx = /\s-\s\w+\sTranslated$/
-      return if rel_id == docidentifier || rel_id.match(tr_rgx).to_s != docidentifier.match(tr_rgx).to_s
+      return if rel_id == docidentifier ||
+        rel_id.match(DataFetcher::TRRGX).to_s != docidentifier.match(DataFetcher::TRRGX).to_s
 
-      if rel_id.include?(docidentifier.sub(tr_rgx, ""))
-        "hasEdition"
-      elsif docidentifier.include?(rel_id.sub(tr_rgx, ""))
-        "editionOf"
+      if rel_id.include?(docidentifier.sub(DataFetcher::TRRGX, ""))
+        "updatedBy"
+      elsif docidentifier.include?(rel_id.sub(DataFetcher::TRRGX, ""))
+        "updates"
       end
     end
 
