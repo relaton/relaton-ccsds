@@ -157,8 +157,8 @@ describe RelatonCcsds::DataParser do
           [doc, doc_edition_of]
         end
 
-        it { expect(subject.relaton_type(doc["Document_x0020_Number"])).to be_nil }
-        it { expect(subject.relaton_type(docs[1]["Document_x0020_Number"])).to eq "hasEdition" }
+        it { expect(subject.relation_type(doc["Document_x0020_Number"])).to be_nil }
+        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "hasEdition" }
       end
 
       context "editionOf" do
@@ -168,7 +168,17 @@ describe RelatonCcsds::DataParser do
           [doc, doc_has_edition]
         end
 
-        it { expect(subject.relaton_type(docs[1]["Document_x0020_Number"])).to eq "editionOf" }
+        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "editionOf" }
+      end
+
+      it "one ID is translation" do
+        expect(subject).to receive(:docidentifier).and_return("CCSDS 650.0-B-1-S").twice
+        expect(subject.relation_type("CCSDS 650.0-B-1-S - French Translated")).to be_nil
+      end
+
+      it "both IDs are translations" do
+        expect(subject).to receive(:docidentifier).and_return("CCSDS 650.0-B-1 - French Translated").exactly(3).times
+        expect(subject.relation_type("CCSDS 650.0-B-1-S - French Translated")).to eq "hasEdition"
       end
     end
 

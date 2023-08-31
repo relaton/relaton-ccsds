@@ -37,7 +37,7 @@ module RelatonCcsds
     end
 
     # @return [Hash]
-    def to_hash
+    def to_hash(embedded: false)
       hash = super
       if technology_area
         hash["ext"] ||= {}

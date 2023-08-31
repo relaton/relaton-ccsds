@@ -15,6 +15,8 @@ module RelatonCcsds
       FileRef,ISO_x0020_Number,Patents,Extra_x0020_Link,Area,calHtmlColorCode&$filter=Book_x0020_Type%20eq%20%27Silver%20Book%27
     URL
 
+    TRRGX = /\s-\s\w+\sTranslated$/.freeze
+
     def initialize(output, format)
       @output = output
       @format = format
@@ -67,9 +69,10 @@ module RelatonCcsds
       save_bib bibitem
     end
 
-    def save_bib(bib)
+    def save_bib(bib) # rubocop:disable Metrics/MethodLength
+      search_translation bib
       id = bib.docidentifier.first.id
-      file = File.join @output, "#{id.gsub(/[.\s]+/, '-')}.#{@ext}"
+      file = File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
       if @files.include? file
         puts "(#{file}) file already exists. Trying to merge links ..."
         merge_links bib, file
@@ -78,6 +81,50 @@ module RelatonCcsds
       end
       File.write file, content(bib), encoding: "UTF-8"
       index.add_or_update id, file
+    end
+
+    def search_translation(bib) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      bibid = bib.docidentifier.first.id.dup
+      if bibid.sub!(TRRGX, "")
+        index.search do |row|
+          id = row[:id].sub(TRRGX, "")
+          next if id != bibid || row[:id] == bib.docidentifier.first.id
+
+          create_translation_relation bib, row[:file]
+        end
+      else
+        index.search do |row|
+          next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
+
+          create_instance_relation bib, row[:file]
+        end
+      end
+    end
+
+    def create_translation_relation(bib, file)
+      hash = YAML.load_file file
+      inst = BibliographicItem.from_hash hash
+      if inst.docidentifier.first.id.match?(TRRGX)
+        type1 = type2 = "hasTranslation"
+      else
+        type1 = "instanceOf"
+        type2 = "hasInstance"
+      end
+      create_relation(bib, inst, type1)
+      create_relation(inst, bib, type2)
+    end
+
+    def create_instance_relation(bib, file)
+      hash = YAML.load_file file
+      inst = BibliographicItem.from_hash hash
+      create_relation bib, inst, "hasInstance"
+      create_relation inst, bib, "instanceOf"
+    end
+
+    def create_relation(bib1, bib2, type)
+      fref = RelatonBib::FormattedRef.new content: bib2.docidentifier.first.id
+      rel = BibliographicItem.new docid: bib2.docidentifier, formattedref: fref
+      bib1.relation << RelatonBib::DocumentRelation.new(type: type, bibitem: rel)
     end
 
     def merge_links(bib, file) # rubocop:disable Metrics/AbcSize

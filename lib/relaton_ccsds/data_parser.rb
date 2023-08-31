@@ -82,7 +82,7 @@ module RelatonCcsds
     def parse_relation
       @docs.each_with_object(successor + adopted) do |d, a|
         id = docidentifier d["Document_x0020_Number"].strip
-        type = relaton_type id
+        type = relation_type id
         next unless type
 
         a << create_relation(type, id)
@@ -104,11 +104,13 @@ module RelatonCcsds
       [create_relation("hasSuccessor", @successor.docidentifier[0].id)]
     end
 
-    def relaton_type(rel_id)
-      same = rel_id == docidentifier
-      if rel_id.include?(docidentifier) && !same
+    def relation_type(rel_id)
+      tr_rgx = /\s-\s\w+\sTranslated$/
+      return if rel_id == docidentifier || rel_id.match(tr_rgx).to_s != docidentifier.match(tr_rgx).to_s
+
+      if rel_id.include?(docidentifier.sub(tr_rgx, ""))
         "hasEdition"
-      elsif docidentifier.include?(rel_id) && !same
+      elsif docidentifier.include?(rel_id.sub(tr_rgx, ""))
         "editionOf"
       end
     end
