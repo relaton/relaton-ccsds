@@ -1,0 +1,104 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/data/CCSDS-650-0-M-2-French-Translated.yaml
+    body:
+      encoding: US-ASCII
+      base64_string: ''
+    headers:
+      Accept-Encoding:
+      - gzip,deflate,identity
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Mechanize/2.9.1 Ruby/3.2.0p0 (http://github.com/sparklemotion/mechanize/)
+      Accept-Charset:
+      - ISO-8859-1,utf-8;q=0.7,*;q=0.7
+      Accept-Language:
+      - en-us,en;q=0.5
+      Host:
+      - raw.githubusercontent.com
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - '300'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '825'
+      Cache-Control:
+      - max-age=300
+      Content-Security-Policy:
+      - default-src 'none'; style-src 'unsafe-inline'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Etag:
+      - W/"9f198bed98f32880867b3d71a840648d1804cb9eb559b2759f08ae30a5c35d91"
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - deny
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Github-Request-Id:
+      - F016:337E:1FF26E:258765:64F121C6
+      Content-Encoding:
+      - gzip
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Thu, 31 Aug 2023 23:27:03 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-iad-kcgs7200116-IAD
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1693524423.321956,VS0,VE72
+      Vary:
+      - Authorization,Accept-Encoding,Origin
+      Access-Control-Allow-Origin:
+      - "*"
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      X-Fastly-Request-Id:
+      - cfc74e200b88bf7b6ea02bc2703088b709ff50b0
+      Expires:
+      - Thu, 31 Aug 2023 23:32:03 GMT
+      Source-Age:
+      - '0'
+    body:
+      encoding: UTF-8
+      base64_string: |
+        H4sIAAAAAAAAA6VUvXIbNxDu7ym2kzSTO9LMxMWpYqR4hplwpDHTZ5a4JYkY
+        B1yABUfq/Bru0lkcP0I63ZvkSbLAkZRos3LYEMDtz7fffrtlWRZBbajFcks+
+        aGdr2L6pJtWPhW5quLlZ3C7e/jSuxuW8nJTvPFm1+d2jDQaZmoI1G6qLEpSz
+        TJZrmLumfzIEDYHvd6t+l1wIOhc9RAuLx8D9U0vgouRjaP79+Am92ugtrinf
+        tF053yILFLi8m84WVwWAQbuOYlHLuQSy8heU1x0PD78hp6fBsQamBx51BrUt
+        jLYfTvBtmLtQj0ZdXBqtKqVCEyrn16P7uAwjKfVh3E4u311VXbOSkPzYUQ3p
+        3DgljEioIy9wJEYgDNTAK24OztlWbp3XLfpHgecjFY3YpGj7BAlN2GSvLZoo
+        T5Pxm0k5fltQoxMXqdBjEReTi8LTNsc4GuIysEfFJ+Ve3BAzwb0XQv+K0hNS
+        rm3RNv1O6JYGaatZGkOwxECQPqaLdI/JtxSAOF0knqKOg4AQ5lPPus5IQLQM
+        /d/f2Vhh7a4jC9PBzOTgs1dWKSa1VxX8YkRRFFh0IOxhE1X+vhKy+8+oBXgT
+        oT2vvAP98Kpdz1/gPa1oMBDFkknaAbSngM6A2UuygrmUZRlz4J+d+1DBLAQh
+        eFLBr4nB1BV4/qcSbcJ+skCaEymVoq0yMREbQBn0eqVVThISmZ13nRuYPmMg
+        1VnXLj3Fh2NXfpCJgA49axWNJg+KTNSZ9GnkjeDUSnO/A9ySyoFN7gd7d6BS
+        +NtHSxnuBYLX/S75fN26JI0k8peX6wGn8yKuDDKnEOFg2++Mdv4AXbzAiGmj
+        ce2xTfK6zlDwT5fpyJfZabLGO81h0JNS/dMQXXgSLdzfziq4+D/7QaY6MHIM
+        yVBOQ4jjEL7MpSeDwxweZlZbsRfK7tKeWOqlFnkMzt9uzqGbwwZJx7NbJH/5
+        emuk3+nmSC9DJbJlPK3qvdVx5s+HPV/8fv2kvaEV5WXjvEaz9i52qVaLrRjM
+        72bzRXk7nRXinRIyqY11xq0f/0BPKBY6ZI3LAB36LVvmZILmaIXfVjDCgvxW
+        8gUZNcLiP7KQYA6FBgAA
+  recorded_at: Thu, 31 Aug 2023 23:27:03 GMT
+recorded_with: VCR 6.2.0

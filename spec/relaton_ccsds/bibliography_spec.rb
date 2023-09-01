@@ -34,5 +34,14 @@ describe RelatonCcsds::Bibliography do
       expect(xml).to be_equivalent_to File.read(file, encoding: "UTF-8")
         .sub(%r{(?<=<fetched>)\d{4}-\d{2}-\d{2}}, Date.today.to_s)
     end
+
+    it "translated doc by code", vcr: "ccsds_650_0-m-2_french_translated" do
+      doc = described_class.get "CCSDS 650.0-M-2 - French Translated"
+      xml = doc.to_xml bibdata: true
+      file = "spec/fixtures/ccsds_650_0-m-2_french_translated.xml"
+      File.write file, xml, encoding: "UTF-8" unless File.exist? file
+      expect(xml).to be_equivalent_to File.read(file, encoding: "UTF-8")
+        .sub(%r{(?<=<fetched>)\d{4}-\d{2}-\d{2}}, Date.today.to_s)
+    end
   end
 end
