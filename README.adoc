@@ -43,7 +43,7 @@ item = hits[0].fetch
 [source,ruby]
 ----
 item.to_xml
-=> "<bibitem id="CCSDS230.2-G-1" schema-version="v1.2.3">
+=> "<bibitem id="CCSDS230.2-G-1" schema-version="v1.2.4">
       <fetched>2023-08-25</fetched>
       <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
       <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
@@ -55,7 +55,7 @@ With argument `bibdata: true` it outputs XML wrapped by `bibdata` element and ad
 [source,ruby]
 ----
 item.to_xml bibdata: true
-=> "<bibdata schema-version="v1.2.3">
+=> "<bibdata schema-version="v1.2.4">
       <fetched>2023-08-25</fetched>
       <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
       <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
@@ -120,7 +120,7 @@ RelatonCcsds::XMLParser.from_xml File.read('spec/fixtures/ccsds_230_2-g-1.xml')
 [source,ruby]
 ----
 hash = YAML.load_file 'spec/fixtures/ccsds_230_2-g-1.yaml'
-=> {"schema-version"=>"v1.2.3",
+=> {"schema-version"=>"v1.2.4",
  "id"=>"CCSDS230.2-G-1",
 ...
 
