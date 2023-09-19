@@ -20,9 +20,9 @@ module RelatonCcsds
   # Your code goes here...
 
   def self.grammar_hash
-    gem_path = File.expand_path "..", __dir__
-    grammars_path = File.join gem_path, "grammars", "*"
-    grammars = Dir[grammars_path].sort.map { |gp| File.read gp }.join
-    Digest::MD5.hexdigest grammars
+    # gem_path = File.expand_path "..", __dir__
+    # grammars_path = File.join gem_path, "grammars", "*"
+    # grammars = Dir[grammars_path].sort.map { |gp| File.read gp }.join
+    Digest::MD5.hexdigest RelatonCcsds::VERSION + RelatonBib::VERSION # grammars
   end
 end
