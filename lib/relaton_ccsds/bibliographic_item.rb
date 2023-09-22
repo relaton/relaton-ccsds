@@ -7,7 +7,7 @@ module RelatonCcsds
     # @param technology_area [String, nil]
     def initialize(**args)
       if args[:doctype] && !DOCTYPES.include?(args[:doctype])
-        Util.warn "WARNING: invalid doctype: #{args[:doctype]}"
+        Util.warn "WARNING: invalid doctype: `#{args[:doctype]}`"
       end
       @technology_area = args.delete(:technology_area)
       super
