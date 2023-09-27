@@ -130,67 +130,70 @@ describe RelatonCcsds::DataFetcher do
       end
     end
 
-    context "#search_translation" do
-      context "for translation" do
-        let(:bib) do
-          docid = double(id: "CCSDS 650.0-M-2 - French Translated")
-          double(:bibitem, docidentifier: [docid])
-        end
-
-        it "found instance" do
-          expect(subject.index).to receive(:search).and_yield(id: "CCSDS 650.0-M-2", file: "file.yaml")
-          expect(subject).to receive(:create_translation_relation).with(bib, "file.yaml")
-          subject.search_translation bib
-        end
-
-        it "found another translation" do
-          expect(subject.index).to receive(:search)
-            .and_yield(id: "CCSDS 650.0-M-2 - Russian Translated", file: "file.yaml")
-          expect(subject).to receive(:create_translation_relation).with(bib, "file.yaml")
-          subject.search_translation bib
-        end
-
-        it "not found" do
-          expect(subject.index).to receive(:search).and_yield(id: "CCSDS 651.0-M-1", file: "file.yaml")
-          expect(subject).not_to receive(:create_translation_relation)
-          subject.search_translation bib
-        end
-
-        it "skip self" do
-          expect(subject.index).to receive(:search)
-            .and_yield(id: "CCSDS 650.0-M-2 - French Translated", file: "file.yaml")
-          expect(subject).not_to receive(:create_translation_relation)
-          subject.search_translation bib
-        end
-
-        it "skip successor" do
-          expect(subject.index).to receive(:search)
-            .and_yield(id: "CCSDS 650.0-M-2-S - French Translated", file: "file.yaml")
-          expect(subject).not_to receive(:create_translation_relation)
-          subject.search_translation bib
-        end
+    context "#search_instance_translation" do
+      it "instance" do
+        bib = double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1")])
+        expect(subject).to receive(:search_translations).with("CCSDS 123.0-B-1", bib)
+        subject.search_instance_translation bib
       end
 
-      context "for instance" do
-        let(:bib) { double(:bibitem, docidentifier: [double(id: "CCSDS 650.0-M-2")]) }
-
-        it "found translation" do
-          expect(subject.index).to receive(:search)
-            .and_yield({ id: "CCSDS 650.0-M-2 - French Translated", file: "file.yaml" })
-          expect(subject).to receive(:create_instance_relation).with(bib, "file.yaml")
-          subject.search_translation bib
-        end
-
-        it "not found" do
-          expect(subject.index).to receive(:search).and_yield({ id: "CCSDS 650.0-M-2", file: "file.yaml" })
-          expect(subject).not_to receive(:create_instance_relation)
-          subject.search_translation bib
-        end
+      it "translation" do
+        bib = double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1 - French Translated")])
+        expect(subject).to receive(:search_relations).with "CCSDS 123.0-B-1", bib
+        subject.search_instance_translation bib
       end
     end
 
-    context "#create_translation_relation" do
-      let(:inst) { double "Instance bib", docidentifier: [docid] }
+    context "#search_relations" do
+      let(:bibid) { "CCSDS 123.0-B-1" }
+      let(:bib) do
+        double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1 -- Russian Translated")])
+      end
+
+      it "found instance" do
+        expect(subject.index).to receive(:search).and_yield(id: bibid, file: "file.yaml")
+        expect(subject).to receive(:create_relations).with(bib, "file.yaml")
+        subject.search_relations bibid, bib
+      end
+
+      it "found another translation" do
+        expect(subject.index).to receive(:search).and_yield(
+          id: "CCSDS 123.0-B-1 - French Translated", file: "file.yaml",
+        )
+        expect(subject).to receive(:create_relations).with(bib, "file.yaml")
+        subject.search_relations bibid, bib
+      end
+
+      it "not found" do
+        expect(subject.index).to receive(:search).and_yield(
+          id: "CCSDS 551.1-O-2 - Russian Translated", file: "file.yaml",
+        )
+        expect(subject).not_to receive(:create_relations)
+        subject.search_relations bibid, bib
+      end
+    end
+
+    context "#search_translations" do
+      let(:bibid) { "CCSDS 123.0-B-1" }
+
+      it "found" do
+        bib = double(:bibitem, docidentifier: [double(id: bibid)])
+        expect(subject.index).to receive(:search).and_yield(id: "CCSDS 123.0-B-1 - Russian Translated", file: "file.yaml")
+        expect(subject).to receive(:create_instance_relation).with(bib, "file.yaml")
+        subject.search_translations bibid, bib
+      end
+
+      it "not found" do
+        bib = double(:bibitem, docidentifier: [double(id: bibid)])
+        expect(subject.index).to receive(:search).and_yield(id: bibid, file: "file.yaml")
+        expect(subject).not_to receive(:create_instance_relation)
+        subject.search_translations bibid, bib
+      end
+    end
+
+    context "#create_relations" do
+      let(:inst) { double "Instance bib", docidentifier: [docid], relation: [] }
+      let(:bib) { double "Bibitem", relation: [] }
 
       before do
         expect(YAML).to receive(:load_file).with("file.yaml").and_return :hash
@@ -203,9 +206,11 @@ describe RelatonCcsds::DataFetcher do
         let(:docid) { double(id: "CCSDS 650.0-M-2 - Russian Translated") }
 
         it do
-          expect(subject).to receive(:create_relation).with(:bib, inst, "hasTranslation")
-          expect(subject).to receive(:create_relation).with(inst, :bib, "hasTranslation")
-          subject.create_translation_relation :bib, "file.yaml"
+          expect(subject).to receive(:create_relation).with(inst, "hasTranslation").and_return :has_translation
+          expect(subject).to receive(:create_relation).with(bib, "hasTranslation").and_return :has_translation
+          subject.create_relations bib, "file.yaml"
+          expect(bib.relation).to eq [:has_translation]
+          expect(inst.relation).to eq [:has_translation]
         end
       end
 
@@ -213,33 +218,38 @@ describe RelatonCcsds::DataFetcher do
         let(:docid) { double(id: "CCSDS 650.0-M-2") }
 
         it do
-          expect(subject).to receive(:create_relation).with(:bib, inst, "instanceOf")
-          expect(subject).to receive(:create_relation).with(inst, :bib, "hasInstance")
-          subject.create_translation_relation :bib, "file.yaml"
+          expect(subject).to receive(:create_relation).with(inst, "instanceOf").and_return :instance_of
+          expect(subject).to receive(:create_relation).with(bib, "hasInstance").and_return :has_instance
+          subject.create_relations bib, "file.yaml"
+          expect(bib.relation).to eq [:instance_of]
+          expect(inst.relation).to eq [:has_instance]
         end
       end
     end
 
     it "#create_instance_relation" do
+      bib = double "Bibitem", relation: []
+      inst = double "Instance bib", relation: []
       expect(YAML).to receive(:load_file).with("file.yaml").and_return :hash
-      expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(:hash).and_return :inst
-      expect(subject).to receive(:create_relation).with(:bib, :inst, "hasInstance")
-      expect(subject).to receive(:create_relation).with(:inst, :bib, "instanceOf")
-      expect(subject).to receive(:content).with(:inst).and_return :content
+      expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(:hash).and_return inst
+      expect(subject).to receive(:create_relation).with(inst, "hasInstance").and_return :has_instance
+      expect(subject).to receive(:create_relation).with(bib, "instanceOf").and_return :instance_of
+      expect(subject).to receive(:content).with(inst).and_return :content
       expect(File).to receive(:write).with("file.yaml", :content, encoding: "UTF-8")
-      subject.create_instance_relation :bib, "file.yaml"
+      subject.create_instance_relation bib, "file.yaml"
+      expect(bib.relation).to eq [:has_instance]
+      expect(inst.relation).to eq [:instance_of]
     end
 
     it "#create_relation" do
-      bib2 = double("Bibitem 2", docidentifier: [double(type: "CCSDS", id: "CCSDS 123.0-B-1")])
-      bib1 = double("Bibitem 1", relation: [])
-      subject.create_relation bib1, bib2, "hasInstance"
-      expect(bib1.relation.size).to eq 1
-      expect(bib1.relation.first).to be_instance_of RelatonBib::DocumentRelation
-      expect(bib1.relation.first.type).to eq "hasInstance"
-      expect(bib1.relation.first.bibitem).to be_instance_of RelatonCcsds::BibliographicItem
-      expect(bib1.relation.first.bibitem.docidentifier.first.id).to eq "CCSDS 123.0-B-1"
-      expect(bib1.relation.first.bibitem.formattedref.content).to eq "CCSDS 123.0-B-1"
+      bib = double("Bibitem 2", docidentifier: [double(type: "CCSDS", id: "CCSDS 123.0-B-1")])
+      rel = subject.create_relation bib, "hasInstance"
+      expect(rel).to be_instance_of RelatonBib::DocumentRelation
+      expect(rel.type).to eq "hasInstance"
+      expect(rel.bibitem).to be_instance_of RelatonCcsds::BibliographicItem
+      expect(rel.bibitem.docidentifier.first.id).to eq "CCSDS 123.0-B-1"
+      expect(rel.bibitem.docidentifier.first.type).to eq "CCSDS"
+      expect(rel.bibitem.formattedref.content).to eq "CCSDS 123.0-B-1"
     end
   end
 end

@@ -17,6 +17,12 @@ module RelatonCcsds
 
     TRRGX = /\s-\s\w+\sTranslated$/.freeze
 
+    #
+    # Initialize fetcher
+    #
+    # @param [String] output path to output directory
+    # @param [String] format output format (yaml, xml, bibxml)
+    #
     def initialize(output, format)
       @output = output
       @format = format
@@ -36,6 +42,14 @@ module RelatonCcsds
       @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v1.yaml"
     end
 
+    #
+    # Create fetcher instance and fetch data
+    #
+    # @param [String] output path to output directory (default: "data")
+    # @param [String] format output format (yaml, xml, bibxml) (default: "yaml")
+    #
+    # @return [void]
+    #
     def self.fetch(output: "data", format: "yaml")
       t1 = Time.now
       puts "Started at: #{t1}"
@@ -52,6 +66,14 @@ module RelatonCcsds
       index.save
     end
 
+    #
+    # Fetch documents from url
+    #
+    # @param [String] url
+    # @param [Boolean] retired if true, then fetch retired documents
+    #
+    # @return [void]
+    #
     def fetch_docs(url, retired: false)
       resp = agent.get(url)
       json = JSON.parse resp.body
@@ -60,6 +82,15 @@ module RelatonCcsds
       end
     end
 
+    #
+    # Parse document and save to file
+    #
+    # @param [Hash] doc document data
+    # @param [Array<Hash>] results collection of documents
+    # @param [Boolean] retired if true then document is retired
+    #
+    # @return [void]
+    #
     def parse_and_save(doc, results, retired)
       bibitem = DataParser.new(doc, results).parse
       if retired
@@ -69,8 +100,15 @@ module RelatonCcsds
       save_bib bibitem
     end
 
+    #
+    # Save bibitem to file
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib bibitem
+    #
+    # @return [void]
+    #
     def save_bib(bib)
-      search_translation bib
+      search_instance_translation bib
       id = bib.docidentifier.first.id
       file = File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
       if @files.include?(file)
@@ -82,52 +120,117 @@ module RelatonCcsds
       index.add_or_update id, file
     end
 
-    def search_translation(bib) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    #
+    # Search translation and instance relation
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib <description>
+    #
+    # @return [void]
+    #
+    def search_instance_translation(bib)
       bibid = bib.docidentifier.first.id.dup
       if bibid.sub!(TRRGX, "")
-        index.search do |row|
-          id = row[:id].sub(TRRGX, "")
-          next if id != bibid || row[:id] == bib.docidentifier.first.id
-
-          create_translation_relation bib, row[:file]
-        end
+        search_relations bibid, bib
       else
-        index.search do |row|
-          next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
-
-          create_instance_relation bib, row[:file]
-        end
+        search_translations bibid, bib
       end
     end
 
-    def create_translation_relation(bib, file) # rubocop:disable Metrics/MethodLength
+    #
+    # Search instance or translation relation
+    #
+    # @param [String] bibid instance bibitem id
+    # @param [RelatonCcsds::BibliographicItem] bib instance or translation bibitem
+    #
+    # @return [void]
+    #
+    def search_relations(bibid, bib)
+      index.search do |row|
+        id = row[:id].sub(TRRGX, "")
+        next if id != bibid || row[:id] == bib.docidentifier.first.id
+
+        create_relations bib, row[:file]
+      end
+    end
+
+    def search_translations(bibid, bib)
+      index.search do |row|
+        next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
+
+        create_instance_relation bib, row[:file]
+      end
+    end
+
+    #
+    # Create translation or instance relation and save to file
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib bibliographic item
+    # @param [String] file translation or instance file
+    #
+    # @return [void]
+    #
+    def create_relations(bib, file)
       hash = YAML.load_file file
       inst = BibliographicItem.from_hash hash
-      if inst.docidentifier.first.id.match?(TRRGX)
-        type1 = type2 = "hasTranslation"
-      else
-        type1 = "instanceOf"
-        type2 = "hasInstance"
-      end
-      create_relation(bib, inst, type1)
-      create_relation(inst, bib, type2)
+      type1, type2 = translation_relation_types(inst)
+      bib.relation << create_relation(inst, type1)
+      inst.relation << create_relation(bib, type2)
       File.write file, content(inst), encoding: "UTF-8"
     end
 
+    #
+    # Translation or instance relation types
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib bibliographic item
+    #
+    # @return [Array<String>] relation types
+    #
+    def translation_relation_types(bib)
+      if bib.docidentifier.first.id.match?(TRRGX)
+        ["hasTranslation"] * 2
+      else
+        ["instanceOf", "hasInstance"]
+      end
+    end
+
+    #
+    # Create instance relation and save to file
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib bibliographic item
+    # @param [String] file file name
+    #
+    # @return [void]
+    #
     def create_instance_relation(bib, file)
       hash = YAML.load_file file
       inst = BibliographicItem.from_hash hash
-      create_relation bib, inst, "hasInstance"
-      create_relation inst, bib, "instanceOf"
+      bib.relation << create_relation(inst, "hasInstance")
+      inst.relation << create_relation(bib, "instanceOf")
       File.write file, content(inst), encoding: "UTF-8"
     end
 
-    def create_relation(bib1, bib2, type)
-      fref = RelatonBib::FormattedRef.new content: bib2.docidentifier.first.id
-      rel = BibliographicItem.new docid: bib2.docidentifier, formattedref: fref
-      bib1.relation << RelatonBib::DocumentRelation.new(type: type, bibitem: rel)
+    #
+    # Create relation
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib the related bibliographic item
+    # @param [String] type type of relation
+    #
+    # @return [RelatonBib::DocumentRelation] relation
+    #
+    def create_relation(bib, type)
+      fref = RelatonBib::FormattedRef.new content: bib.docidentifier.first.id
+      rel = BibliographicItem.new docid: bib.docidentifier, formattedref: fref
+      RelatonBib::DocumentRelation.new(type: type, bibitem: rel)
     end
 
+    #
+    # Merge identical documents with different links (updaes given bibitem)
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib bibliographic item
+    # @param [String] file path to existing document
+    #
+    # @return [void]
+    #
     def merge_links(bib, file) # rubocop:disable Metrics/AbcSize
       hash = YAML.load_file file
       bib2 = BibliographicItem.from_hash hash
@@ -139,6 +242,13 @@ module RelatonCcsds
       bib.link << bib2.link[0]
     end
 
+    #
+    # Srerialize bibliographic item
+    #
+    # @param [RelatonCcsds::BibliographicItem] bib <description>
+    #
+    # @return [String] serialized bibliographic item
+    #
     def content(bib)
       case @format
       when "yaml" then bib.to_hash.to_yaml

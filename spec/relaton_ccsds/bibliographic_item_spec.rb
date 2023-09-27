@@ -14,7 +14,7 @@ describe RelatonCcsds::BibliographicItem do
     it "with incorrect doctype" do
       expect do
         described_class.new title: [title: "title"], doctype: "spec"
-      end.to output("[relaton-ccsd] WARNING: invalid doctype: spec\n").to_stderr
+      end.to output("[relaton-ccsd] WARNING: invalid doctype: `spec`\n").to_stderr
     end
   end
 
