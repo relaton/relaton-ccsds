@@ -45,5 +45,13 @@ module RelatonCcsds
       end
       hash
     end
+
+    def to_format(format)
+      return self unless format
+
+      me = deep_clone
+      me.link.select! { |l| l.type.casecmp(format).zero? }
+      me if me.link.any?
+    end
   end
 end

@@ -44,7 +44,7 @@ end
 hits = RelatonCcsds::Bibliography.search("CCSDS 230.2-G-1")
 => <RelatonCcsds::HitCollection:0x00000000001770 @ref=CCSDS 230.2-G-1 @fetched=false>
 
-item = hits[0].fetch
+item = hits[0].doc
 => #<RelatonCcsds::BibliographicItem:0x00000001135f6540
 ...
 ----
@@ -94,7 +94,7 @@ item.link
   @script=nil,
   @type="pdf">]
 
- RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
+RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
 [relaton-ccsd] (CCSDS 720.6-Y-1) fetching...
 [relaton-ccsd] (CCSDS 720.6-Y-1) found `CCSDS 720.6-Y-1`.
 => [#<RelatonBib::TypedUri:0x0000000114183bb0
@@ -117,6 +117,41 @@ RelatonCcsds::Bibliography.get("CCSDS 230.2-G-1")
 [relaton-ccsd] (CCSDS 230.2-G-1) found `CCSDS 230.2-G-1`.
 => #<RelatonCcsds::BibliographicItem:0x00000001135dade0
 ...
+----
+
+=== Get specific format
+
+[source,ruby]
+----
+item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (DOC)")
+[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) fetching...
+[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) found `CCSDS 720.4-Y-1`.
+=> #<RelatonCcsds::BibliographicItem:0x000000011100dfe0
+...
+
+item.link.size
+=> 1
+
+item.link[0].type
+=> "doc"
+
+pry(main)> item.link[0].content.to_s
+=> "https://public.ccsds.org/Pubs/720x4y1.doc"
+
+item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (PDF)")
+[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) fetching...
+[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) found `CCSDS 720.4-Y-1`.
+=> #<RelatonCcsds::BibliographicItem:0x0000000111004620
+...
+
+item.link.size
+=> 1
+
+item.link[0].type
+=> "pdf"
+
+item.link[0].content.to_s
+=> "https://public.ccsds.org/Pubs/720x4y1.pdf"
 ----
 
 === Create bibliographic item from XML

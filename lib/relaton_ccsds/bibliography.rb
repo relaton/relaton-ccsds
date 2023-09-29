@@ -15,22 +15,26 @@ module RelatonCcsds
 
     #
     # Get CCSDS standard by document reference.
+    # If format is not specified, then all format will be returned.
     #
-    # @param text [String]
+    # @param reference [String]
     # @param year [String, nil]
     # @param opts [Hash]
+    # @option opts [String] :format format of fetched document (DOC, PDF)
     #
     # @return [RelatonCcsds::BibliographicItem]
     #
-    def get(ref, _year = nil, _opts = {})
-      Util.warn "(#{ref}) fetching..."
+    def get(reference, _year = nil, opts = {}) # rubocop:disable Metrics/MethodLength
+      ref = reference.sub(/\s\((DOC|PDF)\)$/, "")
+      opts[:format] ||= Regexp.last_match(1)
+      Util.warn "(#{reference}) fetching..."
       hits = search ref
-      if hits.empty?
-        Util.warn "(#{ref}) not found."
+      doc = hits.first&.doc&.to_format(opts[:format])
+      unless doc
+        Util.warn "(#{reference}) not found."
         return nil
       end
-      doc = hits.first.doc
-      Util.warn "(#{ref}) found `#{hits.first.code}`."
+      Util.warn "(#{reference}) found `#{hits.first.code}`."
       doc
     end
   end

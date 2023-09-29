@@ -12,7 +12,8 @@ describe RelatonCcsds::Bibliography do
 
   context ".get" do
     it "success" do
-      hit = double "hit", code: "CCSDS 121", doc: :doc
+      doc = double "doc", to_format: :doc
+      hit = double "hit", code: "CCSDS 121", doc: doc
       expect(described_class).to receive(:search).with("CCSDS 121").and_return [hit]
       expect do
         expect(described_class.get("CCSDS 121")).to eq :doc
@@ -42,6 +43,19 @@ describe RelatonCcsds::Bibliography do
       File.write file, xml, encoding: "UTF-8" unless File.exist? file
       expect(xml).to be_equivalent_to File.read(file, encoding: "UTF-8")
         .sub(%r{(?<=<fetched>)\d{4}-\d{2}-\d{2}}, Date.today.to_s)
+    end
+
+    context "doc by code with format" do
+      it "success", vcr: "ccsds_720_4-y-1" do
+        doc = described_class.get "CCSDS 720.4-Y-1 (DOC)"
+        expect(doc.link.size).to be 1
+        expect(doc.link.first.type).to eq "doc"
+      end
+
+      it "not found", vcr: "ccsds_230_2-g-1" do
+        doc = described_class.get "CCSDS 230.2-G-1 (DOC)"
+        expect(doc).to be_nil
+      end
     end
   end
 end
