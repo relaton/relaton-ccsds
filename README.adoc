@@ -95,8 +95,8 @@ item.link
   @type="pdf">]
 
 RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
-[relaton-ccsd] (CCSDS 720.6-Y-1) fetching...
-[relaton-ccsd] (CCSDS 720.6-Y-1) found `CCSDS 720.6-Y-1`.
+[relaton-ccsd] (CCSDS 720.6-Y-1) Fetching from Relaton repository ...
+[relaton-ccsd] (CCSDS 720.6-Y-1) Found: `CCSDS 720.6-Y-1`.
 => [#<RelatonBib::TypedUri:0x0000000114183bb0
   @content=#<Addressable::URI:0xca8 URI:https://public.ccsds.org/Pubs/720x6y1.pdf>,
   @language=nil,
@@ -113,8 +113,8 @@ RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
 [source,ruby]
 ----
 RelatonCcsds::Bibliography.get("CCSDS 230.2-G-1")
-[relaton-ccsd] (CCSDS 230.2-G-1) fetching...
-[relaton-ccsd] (CCSDS 230.2-G-1) found `CCSDS 230.2-G-1`.
+[relaton-ccsd] (CCSDS 230.2-G-1) Fetching from Relaton repository ...
+[relaton-ccsd] (CCSDS 230.2-G-1) Found: `CCSDS 230.2-G-1`.
 => #<RelatonCcsds::BibliographicItem:0x00000001135dade0
 ...
 ----
@@ -124,8 +124,8 @@ RelatonCcsds::Bibliography.get("CCSDS 230.2-G-1")
 [source,ruby]
 ----
 item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (DOC)")
-[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) fetching...
-[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) found `CCSDS 720.4-Y-1`.
+[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) Fetching from Relaton repository ...
+[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) Found: `CCSDS 720.4-Y-1`.
 => #<RelatonCcsds::BibliographicItem:0x000000011100dfe0
 ...
 
@@ -139,8 +139,8 @@ pry(main)> item.link[0].content.to_s
 => "https://public.ccsds.org/Pubs/720x4y1.doc"
 
 item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (PDF)")
-[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) fetching...
-[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) found `CCSDS 720.4-Y-1`.
+[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) Fetching from Relaton repository ...
+[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) Found: `CCSDS 720.4-Y-1`.
 => #<RelatonCcsds::BibliographicItem:0x0000000111004620
 ...
 
