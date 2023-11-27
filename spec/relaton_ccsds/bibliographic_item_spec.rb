@@ -4,25 +4,13 @@ describe RelatonCcsds::BibliographicItem do
       bib = described_class.new title: [title: "title"], technology_area: "SLS"
       expect(bib.technology_area).to eq "SLS"
     end
-
-    it "with correct doctype" do
-      expect do
-        described_class.new title: [title: "title"], doctype: "record"
-      end.not_to output.to_stderr
-    end
-
-    it "with incorrect doctype" do
-      expect do
-        described_class.new title: [title: "title"], doctype: "spec"
-      end.to output("[relaton-ccsd] WARNING: Invalid doctype: `spec`\n").to_stderr
-    end
   end
 
   context "instance methods" do
     context "#to_xml" do
       context "creates ext element" do
         it "with doctype" do
-          item = described_class.new title: [title: "title"], doctype: "record"
+          item = described_class.new title: [title: "title"], doctype: RelatonCcsds::DocumentType.new(type: "record")
           xml = item.to_xml bibdata: true
           expect(xml).to include "<ext>"
           expect(xml).to include "<doctype>record</doctype>"

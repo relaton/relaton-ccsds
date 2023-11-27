@@ -74,7 +74,9 @@ describe RelatonCcsds::DataParser do
     end
 
     it "#parse_doctype" do
-      expect(subject.parse_doctype).to eq "standard"
+      doctype = subject.parse_doctype
+      expect(doctype).to be_instance_of RelatonCcsds::DocumentType
+      expect(doctype.type).to eq "standard"
     end
 
     it "#parse_date" do

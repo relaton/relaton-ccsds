@@ -56,7 +56,7 @@ module RelatonCcsds
 
     def parse_doctype
       /^CCSDS\s[\d.]+-(?<type>\w+)/ =~ @doc["Document_x0020_Number"]
-      DOCTYPES[type&.to_sym]
+      DocumentType.new type: DOCTYPES[type&.to_sym]
     end
 
     def parse_date

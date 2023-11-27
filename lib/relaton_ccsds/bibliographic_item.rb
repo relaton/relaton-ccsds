@@ -1,14 +1,9 @@
 module RelatonCcsds
   class BibliographicItem < RelatonBib::BibliographicItem
-    DOCTYPES = %w[standard practice report specification record].freeze
-
     attr_reader :technology_area
 
     # @param technology_area [String, nil]
     def initialize(**args)
-      if args[:doctype] && !DOCTYPES.include?(args[:doctype])
-        Util.warn "WARNING: Invalid doctype: `#{args[:doctype]}`"
-      end
       @technology_area = args.delete(:technology_area)
       super
     end
@@ -27,7 +22,7 @@ module RelatonCcsds
       super do |builder|
         if opts[:bibdata] && (doctype || editorialgroup || technology_area)
           ext = builder.ext do |b|
-            b.doctype doctype if doctype
+            doctype&.to_xml b
             editorialgroup&.to_xml b
             b.send(:"technology-area", technology_area) if technology_area
           end

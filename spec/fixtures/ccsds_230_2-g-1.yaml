@@ -1,5 +1,5 @@
 ---
-schema-version: v1.2.4
+schema-version: v1.2.5
 id: CCSDS230.2-G-1
 title:
 - content: Next Generation Uplink
@@ -35,7 +35,8 @@ docstatus:
   stage:
     value: published
 fetched: '2023-08-25'
-doctype: report
+doctype:
+  type: report
 editorialgroup:
 - name: SLS-NGU
 ext:
