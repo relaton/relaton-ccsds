@@ -27,14 +27,14 @@ module RelatonCcsds
     def get(reference, _year = nil, opts = {}) # rubocop:disable Metrics/MethodLength
       ref = reference.sub(/\s\((DOC|PDF)\)$/, "")
       opts[:format] ||= Regexp.last_match(1)
-      Util.warn "(#{reference}) Fetching from Relaton repository ..."
+      Util.info "Fetching from Relaton repository ...", key: reference
       hits = search ref
       doc = hits.first&.doc&.to_format(opts[:format])
       unless doc
-        Util.warn "(#{reference}) Not found."
+        Util.info "Not found.", key: reference
         return nil
       end
-      Util.warn "(#{reference}) Found: `#{hits.first.code}`."
+      Util.info "Found: `#{hits.first.code}`.", key: reference
       doc
     end
   end

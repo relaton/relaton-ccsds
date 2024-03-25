@@ -112,7 +112,7 @@ module RelatonCcsds
       id = bib.docidentifier.first.id
       file = File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
       if @files.include?(file)
-        puts "(#{file}) file already exists. Trying to merge links ..."
+        Util.info "(#{file}) file already exists. Trying to merge links ..."
         merge_links bib, file
       else @files << file
       end
@@ -235,10 +235,10 @@ module RelatonCcsds
       hash = YAML.load_file file
       bib2 = BibliographicItem.from_hash hash
       if bib.link[0].type == bib2.link[0].type
-        warn "(#{file}) links are the same."
+        Util.info "links are the same.", key: file
         return
       end
-      warn "(#{file}) links are merged."
+      Util.info "links are merged.", key: file
       bib.link << bib2.link[0]
     end
 
