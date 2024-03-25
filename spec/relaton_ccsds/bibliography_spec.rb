@@ -1,8 +1,4 @@
 describe RelatonCcsds::Bibliography do
-  before do
-    RelatonCcsds.instance_variable_set(:@configuration, nil)
-  end
-
   it ".searche" do
     hc = double "hit collection"
     expect(hc).to receive(:fetch).and_return :hits
@@ -17,14 +13,14 @@ describe RelatonCcsds::Bibliography do
       expect(described_class).to receive(:search).with("CCSDS 121").and_return [hit]
       expect do
         expect(described_class.get("CCSDS 121")).to eq :doc
-      end.to output(/\(CCSDS 121\) Found: `CCSDS 121`/).to_stderr
+      end.to output(/\[relaton-ccsds\] INFO: \(CCSDS 121\) Found: `CCSDS 121`/).to_stderr_from_any_process
     end
 
     it "not found" do
       expect(described_class).to receive(:search).with("CCSDS 121").and_return []
       expect do
         expect(described_class.get("CCSDS 121")).to be_nil
-      end.to output(/\(CCSDS 121\) Not found\./).to_stderr
+      end.to output(/\[relaton-ccsds\] INFO: \(CCSDS 121\) Not found\./).to_stderr_from_any_process
     end
 
     it "doc by code", vcr: "ccsds_230_2-g-1" do

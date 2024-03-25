@@ -54,7 +54,7 @@ item = hits[0].doc
 [source,ruby]
 ----
 item.to_xml
-=> "<bibitem id="CCSDS230.2-G-1" schema-version="v1.2.8">
+=> "<bibitem id="CCSDS230.2-G-1" schema-version="v1.2.9">
       <fetched>2023-08-25</fetched>
       <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
       <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
@@ -66,7 +66,7 @@ With argument `bibdata: true` it outputs XML wrapped by `bibdata` element and ad
 [source,ruby]
 ----
 item.to_xml bibdata: true
-=> "<bibdata schema-version="v1.2.8">
+=> "<bibdata schema-version="v1.2.9">
       <fetched>2023-08-25</fetched>
       <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
       <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
@@ -95,8 +95,8 @@ item.link
   @type="pdf">]
 
 RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
-[relaton-ccsd] (CCSDS 720.6-Y-1) Fetching from Relaton repository ...
-[relaton-ccsd] (CCSDS 720.6-Y-1) Found: `CCSDS 720.6-Y-1`.
+[relaton-ccsds] (CCSDS 720.6-Y-1) Fetching from Relaton repository ...
+[relaton-ccsds] (CCSDS 720.6-Y-1) Found: `CCSDS 720.6-Y-1`.
 => [#<RelatonBib::TypedUri:0x0000000114183bb0
   @content=#<Addressable::URI:0xca8 URI:https://public.ccsds.org/Pubs/720x6y1.pdf>,
   @language=nil,
@@ -113,8 +113,8 @@ RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
 [source,ruby]
 ----
 RelatonCcsds::Bibliography.get("CCSDS 230.2-G-1")
-[relaton-ccsd] (CCSDS 230.2-G-1) Fetching from Relaton repository ...
-[relaton-ccsd] (CCSDS 230.2-G-1) Found: `CCSDS 230.2-G-1`.
+[relaton-ccsds] (CCSDS 230.2-G-1) Fetching from Relaton repository ...
+[relaton-ccsds] (CCSDS 230.2-G-1) Found: `CCSDS 230.2-G-1`.
 => #<RelatonCcsds::BibliographicItem:0x00000001135dade0
 ...
 ----
@@ -124,8 +124,8 @@ RelatonCcsds::Bibliography.get("CCSDS 230.2-G-1")
 [source,ruby]
 ----
 item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (DOC)")
-[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) Fetching from Relaton repository ...
-[relaton-ccsd] (CCSDS 720.4-Y-1 (DOC)) Found: `CCSDS 720.4-Y-1`.
+[relaton-ccsds] (CCSDS 720.4-Y-1 (DOC)) Fetching from Relaton repository ...
+[relaton-ccsds] (CCSDS 720.4-Y-1 (DOC)) Found: `CCSDS 720.4-Y-1`.
 => #<RelatonCcsds::BibliographicItem:0x000000011100dfe0
 ...
 
@@ -139,8 +139,8 @@ pry(main)> item.link[0].content.to_s
 => "https://public.ccsds.org/Pubs/720x4y1.doc"
 
 item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (PDF)")
-[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) Fetching from Relaton repository ...
-[relaton-ccsd] (CCSDS 720.4-Y-1 (PDF)) Found: `CCSDS 720.4-Y-1`.
+[relaton-ccsds] (CCSDS 720.4-Y-1 (PDF)) Fetching from Relaton repository ...
+[relaton-ccsds] (CCSDS 720.4-Y-1 (PDF)) Found: `CCSDS 720.4-Y-1`.
 => #<RelatonCcsds::BibliographicItem:0x0000000111004620
 ...
 

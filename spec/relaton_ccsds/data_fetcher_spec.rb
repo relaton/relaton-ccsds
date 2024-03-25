@@ -79,7 +79,9 @@ describe RelatonCcsds::DataFetcher do
       it "file exists" do
         expect(subject).to receive(:merge_links).with(bib, "data/CCSDS-123-0-B-1.xml")
         subject.instance_variable_set(:@files, ["data/CCSDS-123-0-B-1.xml"])
-        expect { subject.save_bib bib }.to output(/file already exists/).to_stdout
+        expect { subject.save_bib bib }.to output(
+          /\[relaton-ccsds\] INFO: \(data\/CCSDS-123-0-B-1\.xml\) file already exists/,
+        ).to_stderr_from_any_process
       end
     end
 
