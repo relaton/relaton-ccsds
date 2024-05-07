@@ -93,7 +93,7 @@ describe RelatonCcsds::DataFetcher do
 
       it "yaml" do
         subject.instance_variable_set(:@format, "yaml")
-        expect(bib).to receive(:to_hash).and_return "id" => "CCSDS 123.0-B-1"
+        expect(bib).to receive(:to_h).and_return "id" => "CCSDS 123.0-B-1"
         expect(subject.content(bib)).to eq "---\nid: CCSDS 123.0-B-1\n"
       end
 
@@ -249,7 +249,7 @@ describe RelatonCcsds::DataFetcher do
       expect(rel.bibitem).to be_instance_of RelatonCcsds::BibliographicItem
       expect(rel.bibitem.docidentifier.first.id).to eq "CCSDS 123.0-B-1"
       expect(rel.bibitem.docidentifier.first.type).to eq "CCSDS"
-      expect(rel.bibitem.formattedref.content).to eq "CCSDS 123.0-B-1"
+      expect(rel.bibitem.formattedref.to_s).to eq "CCSDS 123.0-B-1"
     end
   end
 end
