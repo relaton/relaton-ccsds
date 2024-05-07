@@ -35,9 +35,9 @@ describe RelatonCcsds::DataParser do
       expect(title).to be_instance_of Array
       expect(title.size).to eq 1
       expect(title.first).to be_instance_of RelatonBib::TypedTitleString
-      expect(title.first.title.content).to eq "Lossless Data Compression"
-      expect(title.first.title.language).to eq ["en"]
-      expect(title.first.title.script).to eq ["Latn"]
+      expect(title.first.to_s).to eq "Lossless Data Compression"
+      expect(title.first.language).to eq ["en"]
+      expect(title.first.script).to eq ["Latn"]
     end
 
     it "#parse_docid" do

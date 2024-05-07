@@ -218,7 +218,7 @@ module RelatonCcsds
     # @return [RelatonBib::DocumentRelation] relation
     #
     def create_relation(bib, type)
-      fref = RelatonBib::FormattedRef.new content: bib.docidentifier.first.id
+      fref = RelatonBib::FormattedRef.new bib.docidentifier.first.id
       rel = BibliographicItem.new docid: bib.docidentifier, formattedref: fref
       RelatonBib::DocumentRelation.new(type: type, bibitem: rel)
     end
@@ -251,7 +251,7 @@ module RelatonCcsds
     #
     def content(bib)
       case @format
-      when "yaml" then bib.to_hash.to_yaml
+      when "yaml" then bib.to_h.to_yaml
       when "xml" then bib.to_xml(bibdata: true)
       else bib.send "to_#{@format}"
       end

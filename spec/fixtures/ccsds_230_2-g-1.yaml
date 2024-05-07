@@ -1,5 +1,5 @@
 ---
-schema-version: v1.2.8
+schema-version: v1.3.0
 id: CCSDS230.2-G-1
 title:
 - content: Next Generation Uplink
@@ -7,7 +7,6 @@ title:
   - en
   script:
   - Latn
-  format: text/plain
 link:
 - content: https://public.ccsds.org/Pubs/230x2g1.pdf
   type: pdf
@@ -30,7 +29,6 @@ abstract:
   - en
   script:
   - Latn
-  format: text/plain
 docstatus:
   stage:
     value: published
