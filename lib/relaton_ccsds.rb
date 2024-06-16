@@ -3,6 +3,7 @@
 require "mechanize"
 require "relaton_bib"
 require "relaton/index"
+require "pubid-ccsds"
 require_relative "relaton_ccsds/version"
 require_relative "relaton_ccsds/bibliographic_item"
 require_relative "relaton_ccsds/config"

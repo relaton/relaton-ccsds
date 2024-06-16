@@ -45,7 +45,11 @@ describe RelatonCcsds::DataParser do
       expect(docid).to be_instance_of Array
       expect(docid.size).to eq 1
       expect(docid.first).to be_instance_of RelatonBib::DocumentIdentifier
-      expect(docid.first.id).to eq "CCSDS 121.0-B-3"
+      expect(docid.first.id).to eq({ publisher: "CCSDS",
+                                     number: "121",
+                                     part: "0",
+                                     book_color: "B",
+                                     edition: "3" })
       expect(docid.first.type).to eq "CCSDS"
       expect(docid.first.primary).to be true
     end
