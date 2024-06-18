@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.7.0"
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "mechanize", "~> 2.7"
+  spec.add_dependency "mechanize", "~> 2.10"
   spec.add_dependency "relaton-bib", "~> 1.18.0"
   spec.add_dependency "relaton-index", "~> 0.2.0"
 
