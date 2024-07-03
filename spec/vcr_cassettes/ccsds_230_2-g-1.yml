@@ -39,21 +39,21 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Github-Request-Id:
-      - 87F8:290ED8:46F8F7:4F7548:6670FC19
+      - 5CD6:129DE3:2B8FB6:2FB6FF:66835087
       Accept-Ranges:
       - bytes
       Date:
-      - Tue, 18 Jun 2024 03:16:41 GMT
+      - Tue, 02 Jul 2024 00:57:43 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-pdk-kpdk1780053-PDK
+      - cache-iad-kjyo7100025-IAD
       X-Cache:
       - MISS
       X-Cache-Hits:
       - '0'
       X-Timer:
-      - S1718680602.891097,VS0,VE57
+      - S1719881864.566127,VS0,VE80
       Vary:
       - Authorization,Accept-Encoding,Origin
       Access-Control-Allow-Origin:
@@ -61,13 +61,13 @@ http_interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - 6d756966fd25e5e8125cce44b4a763fb4af72639
+      - 8746ba94546430045488429e29164c227c3c5490
       Expires:
-      - Tue, 18 Jun 2024 03:21:41 GMT
+      - Tue, 02 Jul 2024 01:02:43 GMT
       Source-Age:
       - '0'
     body:
-      encoding: UTF-8
+      encoding: ASCII-8BIT
       base64_string: |
         UEsDBBQAAAAIAKFxglh8NcdKrxIAAEmjAAANABwAaW5kZXgtdjEueWFtbFVU
         CQADbhIMZm4SDGZ1eAsAAQTpAwAABH8AAACVncuO5rYRhfd+in4BdcSiKEqz
@@ -180,7 +180,7 @@ http_interactions:
         FAAAAAgAoXGCWHw1x0qvEgAASaMAAA0AGAAAAAAAAQAAAKSBAAAAAGluZGV4
         LXYxLnlhbWxVVAUAA24SDGZ1eAsAAQTpAwAABH8AAABQSwUGAAAAAAEAAQBT
         AAAA9hIAAAAA
-  recorded_at: Tue, 18 Jun 2024 03:16:41 GMT
+  recorded_at: Tue, 02 Jul 2024 00:57:43 GMT
 - request:
     method: get
     uri: https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/data/CCSDS-230-2-G-1.yaml
@@ -193,7 +193,7 @@ http_interactions:
       Accept:
       - "*/*"
       User-Agent:
-      - Mechanize/2.10.0 Ruby/3.2.0p0 (http://github.com/sparklemotion/mechanize/)
+      - Mechanize/2.10.1 Ruby/3.3.3p89 (http://github.com/sparklemotion/mechanize/)
       Accept-Charset:
       - ISO-8859-1,utf-8;q=0.7,*;q=0.7
       Accept-Language:
@@ -230,23 +230,23 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Github-Request-Id:
-      - 5308:3329F:1CB8FC3:207DBD1:6670FC19
+      - 54E5:129DE3:2B8FDC:2FB72E:66835087
       Content-Encoding:
       - gzip
       Accept-Ranges:
       - bytes
       Date:
-      - Tue, 18 Jun 2024 03:16:42 GMT
+      - Tue, 02 Jul 2024 00:57:43 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-pdk-kpdk1780049-PDK
+      - cache-iad-kjyo7100080-IAD
       X-Cache:
       - MISS
       X-Cache-Hits:
       - '0'
       X-Timer:
-      - S1718680602.047091,VS0,VE70
+      - S1719881864.806896,VS0,VE65
       Vary:
       - Authorization,Accept-Encoding,Origin
       Access-Control-Allow-Origin:
@@ -254,13 +254,13 @@ http_interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - e2587bf13dadbbc32e811108bf1450e910f0cd29
+      - 351234a66782f0d3923f8884ae71fd58b3698f60
       Expires:
-      - Tue, 18 Jun 2024 03:21:42 GMT
+      - Tue, 02 Jul 2024 01:02:43 GMT
       Source-Age:
       - '0'
     body:
-      encoding: UTF-8
+      encoding: ASCII-8BIT
       base64_string: |
         H4sIAAAAAAAAA6VSTY/TMBC9+1fMbeHgtA0rgXJDRapAZYUoe0ZTe5pYOLbl
         j2or8eMZuyXVnvcUZ+bN83tvLKUUSU00ozxTTMa7Ac6bru8+CaMH2G4PXw79
@@ -273,5 +273,5 @@ http_interactions:
         99rAW1+cMpab0Zdxgm/FEZvuH7u3vADWkjLmkiqQT1eKJf37QhjYdrTsM7bI
         2l58NGhHlhVq6A5nbh/2B/m0exZ8VZshNTlv/Xj5jZGQ+y2ePT9AOFA8G8Wh
         f+aO+AddOc3eJgMAAA==
-  recorded_at: Tue, 18 Jun 2024 03:16:41 GMT
+  recorded_at: Tue, 02 Jul 2024 00:57:43 GMT
 recorded_with: VCR 6.2.0
