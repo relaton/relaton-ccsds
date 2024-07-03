@@ -23,24 +23,13 @@ Or install it yourself as:
 
 == Usage
 
-=== Configuration
-
-Configuration is optional. The available option is `logger` which is a `Logger` instance. By default, the logger is `Logger.new($stderr)` with `Logger::WARN` level. To change the logger level, use `RelatonCcsds.configure` block.
+=== Search for a standard using keywords
 
 [source,ruby]
 ----
 require 'relaton_ccsds'
 => true
 
-RelatonCcsds.configure do |config|
-  config.logger.level = Logger::DEBUG
-end
-----
-
-=== Search for a standard using keywords
-
-[source,ruby]
-----
 hits = RelatonCcsds::Bibliography.search("CCSDS 230.2-G-1")
 => <RelatonCcsds::HitCollection:0x00000000001770 @ref=CCSDS 230.2-G-1 @fetched=false>
 
@@ -194,6 +183,10 @@ Started at: 2023-08-25 22:02:06 -0400
 Done in: 20 sec.
 => nil
 ----
+
+=== Logging
+
+RelatonCcsds uses the relaton-logger gem for logging. By default, it logs to STDOUT. To change the log levels and add other loggers, read the https://github.com/relaton/relaton-logger#usage[relaton-logger] documentation.
 
 == Development
 

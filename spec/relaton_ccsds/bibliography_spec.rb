@@ -1,4 +1,10 @@
 describe RelatonCcsds::Bibliography do
+  before do
+    # Force to download index file
+    allow_any_instance_of(Relaton::Index::Type).to receive(:actual?).and_return(false)
+    allow_any_instance_of(Relaton::Index::FileIO).to receive(:check_file).and_return(nil)
+  end
+
   it ".searche" do
     hc = double "hit collection"
     expect(hc).to receive(:fetch).and_return :hits
