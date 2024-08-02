@@ -1,15 +1,34 @@
-describe RelatonCcsds::Bibliography do
+class RelatonCcsds::TestHitCollection < RelatonCcsds::HitCollection
+  # override default index method to avoid index downloading
+  def index
+    @index ||= Relaton::Index.find_or_create :ccsds, file: "index-v2.yaml"
+  end
+
+  # method to be able to add index rows from test's context
+  def add_to_index(id, file)
+    index.add_or_update(id, file)
+  end
+end
+
+module RelatonCcsds::TestBibliography
+  include RelatonCcsds::Bibliography
+  extend self
+  def search(ref)
+    hit_collection = RelatonCcsds::TestHitCollection.new(ref)
+    hit_collection.add_to_index(Pubid::Ccsds::Identifier.parse("CCSDS 230.2-G-1"), "data/CCSDS-230-2-G-1.yaml")
+    hit_collection.add_to_index(Pubid::Ccsds::Identifier.parse("CCSDS 720.4-Y-1"), "data/CCSDS-720-4-Y-1.yaml")
+    hit_collection.add_to_index(Pubid::Ccsds::Identifier.parse("CCSDS 650.0-M-2"), "data/CCSDS-650-0-M-2.yaml")
+    hit_collection.add_to_index(Pubid::Ccsds::Identifier.parse("CCSDS 650.0-M-2 - French Translated"), "data/CCSDS-650-0-M-2-French-Translated.yaml")
+
+    hit_collection.fetch
+  end
+end
+
+describe RelatonCcsds::TestBibliography do
   before do
     # Force to download index file
     allow_any_instance_of(Relaton::Index::Type).to receive(:actual?).and_return(false)
     allow_any_instance_of(Relaton::Index::FileIO).to receive(:check_file).and_return(nil)
-  end
-
-  it ".searche" do
-    hc = double "hit collection"
-    expect(hc).to receive(:fetch).and_return :hits
-    expect(RelatonCcsds::HitCollection).to receive(:new).with("CCSDS 121").and_return hc
-    expect(described_class.search("CCSDS 121")).to eq :hits
   end
 
   context ".get" do

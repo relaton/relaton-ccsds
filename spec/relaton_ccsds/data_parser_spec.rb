@@ -8,6 +8,7 @@ describe RelatonCcsds::DataParser do
   context "instance methods" do
     let(:doc) { JSON.parse File.read "spec/fixtures/doc_with_iso.json" }
     let(:docs) { [doc] }
+    let(:identifier) { "CCSDS 121.0-B-3" }
     subject { RelatonCcsds::DataParser.new doc, docs }
 
     it "#parse" do
@@ -45,14 +46,14 @@ describe RelatonCcsds::DataParser do
       expect(docid).to be_instance_of Array
       expect(docid.size).to eq 1
       expect(docid.first).to be_instance_of RelatonBib::DocumentIdentifier
-      expect(docid.first.id).to eq "CCSDS 121.0-B-3"
+      expect(docid.first.id).to eq(Pubid::Ccsds::Identifier.parse(identifier))
       expect(docid.first.type).to eq "CCSDS"
       expect(docid.first.primary).to be true
     end
 
     context "#docidentifier" do
       it "successor" do
-        expect(subject.docidentifier).to eq "CCSDS 121.0-B-3"
+        expect(subject.docidentifier).to eq identifier
       end
 
       it "predecessor" do

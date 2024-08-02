@@ -39,7 +39,7 @@ module RelatonCcsds
     end
 
     def index
-      @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v1.yaml"
+      @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v2.yaml"
     end
 
     #
@@ -100,6 +100,10 @@ module RelatonCcsds
       save_bib bibitem
     end
 
+    def get_output_file(id)
+      File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
+    end
+
     #
     # Save bibitem to file
     #
@@ -109,15 +113,10 @@ module RelatonCcsds
     #
     def save_bib(bib)
       search_instance_translation bib
-      id = bib.docidentifier.first.id
-      file = File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
-      if @files.include?(file)
-        Util.info "(#{file}) file already exists. Trying to merge links ..."
-        merge_links bib, file
-      else @files << file
-      end
+      file = get_output_file(bib.docidentifier.first.id)
+      merge_links bib, file
       File.write file, content(bib), encoding: "UTF-8"
-      index.add_or_update id, file
+      index.add_or_update Pubid::Ccsds::Identifier.parse(bib.docidentifier.first.id), file
     end
 
     #
@@ -146,7 +145,8 @@ module RelatonCcsds
     #
     def search_relations(bibid, bib)
       index.search do |row|
-        id = row[:id].sub(TRRGX, "")
+        id = row[:id].exclude(:language)
+        # TODO: smiplify this line?
         next if id != bibid || row[:id] == bib.docidentifier.first.id
 
         create_relations bib, row[:file]
@@ -154,8 +154,16 @@ module RelatonCcsds
     end
 
     def search_translations(bibid, bib)
+      # will call create_instance_relation if
+      # there are same identifiers in index but with word "Translated"
       index.search do |row|
-        next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
+        # next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
+        if row[:id].is_a?(String)
+          next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
+        else
+          next unless row[:id].language && row[:id].exclude(:language) == bibid
+        end
+        # next unless row[:id].is_a?(String) && row[:id].match?(/^#{bibid}#{TRRGX}/)
 
         create_instance_relation bib, row[:file]
       end
@@ -232,6 +240,14 @@ module RelatonCcsds
     # @return [void]
     #
     def merge_links(bib, file) # rubocop:disable Metrics/AbcSize
+      # skip merging when new file
+      unless @files.include?(file)
+        @files << file
+        return
+      end
+
+      puts "(#{file}) file already exists. Trying to merge links ..."
+
       hash = YAML.load_file file
       bib2 = BibliographicItem.from_hash hash
       if bib.link[0].type == bib2.link[0].type

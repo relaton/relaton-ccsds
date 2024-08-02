@@ -38,7 +38,10 @@ module RelatonCcsds
     end
 
     def parse_docid
-      [RelatonBib::DocumentIdentifier.new(id: docidentifier, type: "CCSDS", primary: true)]
+      [RelatonBib::DocumentIdentifier.new(
+        id: Pubid::Ccsds::Identifier.parse(docidentifier),
+        type: "CCSDS", primary: true
+      )]
     end
 
     def docidentifier(id = nil)
