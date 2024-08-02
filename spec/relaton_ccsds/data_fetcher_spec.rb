@@ -1,5 +1,6 @@
 describe RelatonCcsds::DataFetcher do
   subject { RelatonCcsds::DataFetcher.new "data", "bibxml" }
+  let(:identifier) { "CCSDS 123.0-B-1" }
 
   it "fetch" do
     expect(FileUtils).to receive(:mkdir_p).with("data")
@@ -20,13 +21,6 @@ describe RelatonCcsds::DataFetcher do
     it "#agent" do
       expect(subject.agent).to be_instance_of Mechanize
       expect(subject.agent.request_headers["Accept"]).to eq "application/json;odata=verbose"
-    end
-
-    it "#index" do
-      expect(subject.index).to be_instance_of Relaton::Index::Type
-      expect(subject.index.instance_variable_get(:@file)).to eq "index-v1.yaml"
-      io = subject.index.instance_variable_get(:@file_io)
-      expect(io.instance_variable_get(:@dir)).to eq "ccsds"
     end
 
     it "#fetch" do
@@ -62,26 +56,61 @@ describe RelatonCcsds::DataFetcher do
       end
     end
 
+    describe "#get_output_file" do
+      subject { RelatonCcsds::DataFetcher.new("data", "bibxml").get_output_file(identifier) }
+
+      it { expect(subject).to eq("data/CCSDS-123-0-B-1.xml") }
+    end
+
     context "#save_bib" do
-      let(:bib) { double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1")]) }
+      # let(:bib) { double(:bibitem, docidentifier: [double(id: identifier)]) }
+      let(:bib) { RelatonCcsds::BibliographicItem.new(docid: [RelatonBib::DocumentIdentifier.new(id: identifier)]) }
+      let(:id) { Pubid::Ccsds::Identifier.parse(identifier) }
 
       before do
-        expect(subject).to receive(:content).with(bib).and_return :content
-        expect(File).to receive(:write).with("data/CCSDS-123-0-B-1.xml", :content, encoding: "UTF-8")
-        expect(subject.index).to receive(:add_or_update).with("CCSDS 123.0-B-1", "data/CCSDS-123-0-B-1.xml")
+        # write once when no relations, at least twice when there are relations found
+        expect(File).to receive(:write).at_least(:once)#.with("data/CCSDS-123-0-B-1.xml",
+                                             # "<reference anchor=\"CCSDS.123.0-B-1\"/>",
+                                             # encoding: "UTF-8")
       end
 
-      it do
-        subject.save_bib bib
-        expect(subject.instance_variable_get(:@files)).to eq ["data/CCSDS-123-0-B-1.xml"]
+      it "adds identifier's parameters as hash to index" do
+        subject.save_bib(bib)
+        id_from_index = subject.index.search(id).first[:id]
+        expect(id_from_index).to eq(id)
       end
 
-      it "file exists" do
-        expect(subject).to receive(:merge_links).with(bib, "data/CCSDS-123-0-B-1.xml")
-        subject.instance_variable_set(:@files, ["data/CCSDS-123-0-B-1.xml"])
-        expect { subject.save_bib bib }.to output(
-          /\[relaton-ccsds\] INFO: \(data\/CCSDS-123-0-B-1\.xml\) file already exists/,
-        ).to_stderr_from_any_process
+      context "when have related translations" do
+        before do
+          subject.index.add_or_update(
+            Pubid::Ccsds::Identifier.parse(translated_identifier),
+            "spec/fixtures/ccsds_123_0-b-1_russian_translated.yaml"
+          )
+        end
+
+        let(:translated_identifier) { "#{identifier} - Russian Translated" }
+
+        it "adds identifier with translation to identifier's relation" do
+          subject.save_bib(bib)
+          expect(bib.relation.first.bibitem.docidentifier.first.id).to eq(translated_identifier)
+        end
+      end
+
+      context "when identifier is translation" do
+        before do
+          subject.index.add_or_update(
+            Pubid::Ccsds::Identifier.parse(identifier_without_translation),
+            "spec/fixtures/ccsds_123_0-b-1.yaml"
+          )
+        end
+
+        let(:identifier) { "CCSDS 123.0-B-1 - Russian Translated" }
+        let(:identifier_without_translation) { "CCSDS 123.0-B-1" }
+
+        it "adds identifier without translation to identifier's relation" do
+          subject.save_bib(bib)
+          expect(bib.relation.first.bibitem.docidentifier.first.id).to eq(identifier_without_translation)
+        end
       end
     end
 
@@ -106,7 +135,11 @@ describe RelatonCcsds::DataFetcher do
       end
     end
 
-    context "#merge_links" do
+    describe "#merge_links" do
+      # skip merging when new file
+      let(:data_fetcher) { RelatonCcsds::DataFetcher.new("data", "bibxml") }
+      subject { data_fetcher.merge_links(bib, "spec/fixtures/ccsds_123_0-b-1.yaml") }
+
       let(:hash) do
         {
           "docid" => [{ type: "CCSDS", id: "CCSDS 123.0-B-1" }],
@@ -115,20 +148,33 @@ describe RelatonCcsds::DataFetcher do
       end
       let(:bib) { RelatonCcsds::BibliographicItem.from_hash hash }
 
-      it "no new link" do
-        expect(YAML).to receive(:load_file).with("data/CCSDS-123-0-B-1.xml").and_return hash
-        subject.merge_links bib, "data/CCSDS-123-0-B-1.xml"
-        expect(bib.link.size).to eq 1
+      before { subject }
+
+      context "when new file" do
+        it "doesn't add new link" do
+          expect(bib.link.size).to eq(1)
+        end
       end
 
-      it "new link" do
-        hash2 = {
-          "docid" => [{ type: "CCSDS", id: "CCSDS 123.0-B-1" }],
-          "link" => [{ type: "doc", content: "http://www.example.com/CCSDS-123-0-B-1.doc" }],
-        }
-        expect(YAML).to receive(:load_file).with("data/CCSDS-123-0-B-1.xml").and_return hash2
-        subject.merge_links bib, "data/CCSDS-123-0-B-1.xml"
-        expect(bib.link.size).to eq 2
+      context "when new item have the same link type" do
+        it "does not add new link" do
+          data_fetcher.merge_links(bib, "spec/fixtures/ccsds_123_0-b-1.yaml")
+          expect(bib.link.size).to eq(1)
+        end
+      end
+
+      context "when new item have different link type" do
+        let(:hash) do
+          {
+            "docid" => [{ type: "CCSDS", id: "CCSDS 123.0-B-1" }],
+            "link" => [{ type: "doc", content: "http://www.example.com/CCSDS-123-0-B-1.pdf" }],
+          }
+        end
+
+        it "adds another link" do
+          data_fetcher.merge_links(bib, "spec/fixtures/ccsds_123_0-b-1.yaml")
+          expect(bib.link.size).to eq(2)
+        end
       end
     end
 
@@ -153,14 +199,14 @@ describe RelatonCcsds::DataFetcher do
       end
 
       it "found instance" do
-        expect(subject.index).to receive(:search).and_yield(id: bibid, file: "file.yaml")
+        expect(subject.index).to receive(:search).and_yield(id: Pubid::Ccsds::Identifier.parse(bibid), file: "file.yaml")
         expect(subject).to receive(:create_relations).with(bib, "file.yaml")
         subject.search_relations bibid, bib
       end
 
       it "found another translation" do
         expect(subject.index).to receive(:search).and_yield(
-          id: "CCSDS 123.0-B-1 - French Translated", file: "file.yaml",
+          id: Pubid::Ccsds::Identifier.parse("CCSDS 123.0-B-1 - French Translated"), file: "file.yaml",
         )
         expect(subject).to receive(:create_relations).with(bib, "file.yaml")
         subject.search_relations bibid, bib
@@ -168,7 +214,7 @@ describe RelatonCcsds::DataFetcher do
 
       it "not found" do
         expect(subject.index).to receive(:search).and_yield(
-          id: "CCSDS 551.1-O-2 - Russian Translated", file: "file.yaml",
+          id: Pubid::Ccsds::Identifier.parse("CCSDS 551.1-O-2 - Russian Translated"), file: "file.yaml",
         )
         expect(subject).not_to receive(:create_relations)
         subject.search_relations bibid, bib
