@@ -39,7 +39,7 @@ module RelatonCcsds
 
     def parse_docid
       [RelatonBib::DocumentIdentifier.new(
-        id: Pubid::Ccsds::Identifier.parse(docidentifier),
+        id: docidentifier,
         type: "CCSDS", primary: true
       )]
     end
@@ -107,6 +107,7 @@ module RelatonCcsds
       [create_relation("hasSuccessor", @successor.docidentifier[0].id)]
     end
 
+    # TODO: cover this
     def relation_type(rel_id)
       return if rel_id == docidentifier ||
         rel_id.match(DataFetcher::TRRGX).to_s != docidentifier.match(DataFetcher::TRRGX).to_s
