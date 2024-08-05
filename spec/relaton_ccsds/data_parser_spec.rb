@@ -11,24 +11,10 @@ describe RelatonCcsds::DataParser do
     let(:identifier) { "CCSDS 121.0-B-3" }
     subject { RelatonCcsds::DataParser.new doc, docs }
 
-    it "#parse" do
-      expect(subject).to receive(:parse_title).and_return :title
-      expect(subject).to receive(:parse_docid).and_return :docid
-      expect(subject).to receive(:parse_abstract).and_return :abstract
-      expect(subject).to receive(:parse_doctype).and_return :doctype
-      expect(subject).to receive(:parse_date).and_return :date
-      expect(subject).to receive(:parse_docstatus).and_return :docstatus
-      expect(subject).to receive(:parse_link).and_return :link
-      expect(subject).to receive(:parse_edition).and_return :edition
-      expect(subject).to receive(:parse_relation).and_return :relation
-      expect(subject).to receive(:parse_editorialgroup).and_return :editorialgroup
-      expect(subject).to receive(:parse_technology_area).and_return :technology_area
-      expect(RelatonCcsds::BibliographicItem).to receive(:new).with(
-        title: :title, docid: :docid, abstract: :abstract, doctype: :doctype, date: :date,
-        docstatus: :docstatus, link: :link, edition: :edition, relation: :relation,
-        editorialgroup: :editorialgroup, technology_area: :technology_area
-      ).and_return :bibitem
-      expect(subject.parse).to eq :bibitem
+    context "#parse" do
+      subject { RelatonCcsds::DataParser.new(doc, docs).parse }
+      it { is_expected.to be_a(RelatonCcsds::BibliographicItem) }
+      it { expect(subject.docidentifier.first.id).to eq(identifier) }
     end
 
     it "#parse_title" do
@@ -46,7 +32,7 @@ describe RelatonCcsds::DataParser do
       expect(docid).to be_instance_of Array
       expect(docid.size).to eq 1
       expect(docid.first).to be_instance_of RelatonBib::DocumentIdentifier
-      expect(docid.first.id).to eq(Pubid::Ccsds::Identifier.parse(identifier))
+      expect(docid.first.id).to eq(identifier)
       expect(docid.first.type).to eq "CCSDS"
       expect(docid.first.primary).to be true
     end

@@ -39,7 +39,7 @@ module RelatonCcsds
     end
 
     def index
-      @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v2.yaml"
+      @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v2.yaml", pubid_class: Pubid::Ccsds::Identifier
     end
 
     #
