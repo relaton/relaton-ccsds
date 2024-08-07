@@ -80,6 +80,12 @@ describe RelatonCcsds::DataFetcher do
         expect(id_from_index).to eq(id)
       end
 
+      it "adds identifier as string to old index" do
+        subject.save_bib(bib)
+        id_from_index = subject.old_index.search(identifier).first[:id]
+        expect(id_from_index).to eq(identifier)
+      end
+
       context "when have related translations" do
         before do
           subject.index.add_or_update(
