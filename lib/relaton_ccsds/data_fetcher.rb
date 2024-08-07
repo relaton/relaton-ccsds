@@ -42,6 +42,10 @@ module RelatonCcsds
       @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v2.yaml", pubid_class: Pubid::Ccsds::Identifier
     end
 
+    def old_index
+      @old_index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v1.yaml"
+    end
+
     #
     # Create fetcher instance and fetch data
     #
@@ -64,6 +68,7 @@ module RelatonCcsds
       fetch_docs ACTIVE_PUBS_URL
       fetch_docs OBSOLETE_PUBS_URL, retired: true
       index.save
+      old_index.save
     end
 
     #
@@ -117,6 +122,7 @@ module RelatonCcsds
       merge_links bib, file
       File.write file, content(bib), encoding: "UTF-8"
       index.add_or_update Pubid::Ccsds::Identifier.parse(bib.docidentifier.first.id), file
+      old_index.add_or_update bib.docidentifier.first.id, file
     end
 
     #
