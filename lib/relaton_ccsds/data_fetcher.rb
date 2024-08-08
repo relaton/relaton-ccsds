@@ -163,13 +163,7 @@ module RelatonCcsds
       # will call create_instance_relation if
       # there are same identifiers in index but with word "Translated"
       index.search do |row|
-        # next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
-        if row[:id].is_a?(String)
-          next unless row[:id].match?(/^#{bibid}#{TRRGX}/)
-        else
-          next unless row[:id].language && row[:id].exclude(:language) == bibid
-        end
-        # next unless row[:id].is_a?(String) && row[:id].match?(/^#{bibid}#{TRRGX}/)
+        next unless row[:id].language && row[:id].exclude(:language) == bibid
 
         create_instance_relation bib, row[:file]
       end

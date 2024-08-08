@@ -2,12 +2,14 @@ describe RelatonCcsds::DataFetcher do
   subject { RelatonCcsds::DataFetcher.new "data", "bibxml" }
   let(:identifier) { "CCSDS 123.0-B-1" }
 
-  it "fetch" do
-    expect(FileUtils).to receive(:mkdir_p).with("data")
-    df = double(:datafetcher)
-    expect(df).to receive(:fetch)
-    expect(described_class).to receive(:new).with("data", "yaml").and_return df
-    described_class.fetch
+  context "#fetch" do
+    it "fetches data" do
+      expect(FileUtils).to receive(:mkdir_p).with("data")
+      df = double(:datafetcher)
+      expect(df).to receive(:fetch)
+      expect(described_class).to receive(:new).with("data", "yaml").and_return df
+      described_class.fetch
+    end
   end
 
   it "initialize" do
@@ -232,14 +234,17 @@ describe RelatonCcsds::DataFetcher do
 
       it "found" do
         bib = double(:bibitem, docidentifier: [double(id: bibid)])
-        expect(subject.index).to receive(:search).and_yield(id: "CCSDS 123.0-B-1 - Russian Translated", file: "file.yaml")
+        expect(subject.index).to receive(:search).and_yield(
+          id: Pubid::Ccsds::Identifier.parse("CCSDS 123.0-B-1 - Russian Translated"),
+          file: "file.yaml",
+        )
         expect(subject).to receive(:create_instance_relation).with(bib, "file.yaml")
         subject.search_translations bibid, bib
       end
 
       it "not found" do
         bib = double(:bibitem, docidentifier: [double(id: bibid)])
-        expect(subject.index).to receive(:search).and_yield(id: bibid, file: "file.yaml")
+        expect(subject.index).to receive(:search).and_yield(id: Pubid::Ccsds::Identifier.parse(bibid), file: "file.yaml")
         expect(subject).not_to receive(:create_instance_relation)
         subject.search_translations bibid, bib
       end
