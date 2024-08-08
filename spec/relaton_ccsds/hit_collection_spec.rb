@@ -1,27 +1,49 @@
-describe RelatonCcsds::HitCollection do
-  subject { RelatonCcsds::HitCollection.new("CCSDS 123") }
-
-  it "#index" do
-    url = "https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/index-v1.zip"
-    expect(Relaton::Index).to receive(:find_or_create).with(:ccsds, url: url, file: "index-v1.yaml").and_return :index
-    expect(subject.index).to eq :index
+class RelatonCcsds::TestHitCollection < RelatonCcsds::HitCollection
+  # override default index method to avoid index downloading
+  def index
+    @index ||= Relaton::Index.find_or_create :ccsds, file: "index-v2.yaml"
   end
 
+  # method to be able to add index rows from test's context
+  def add_to_index(id, file)
+    index.add_or_update(id, file)
+  end
+end
+
+describe RelatonCcsds::HitCollection do
+  before { index_rows.each { |k, v| subject.add_to_index(Pubid::Ccsds::Identifier.parse(k.to_s) ,v) } }
+
+  let(:index_rows) do
+    { "CCSDS 103.0-B-1": "data/CCSDS-103.0-B-1.xml",
+      "CCSDS 103.0-B-2": "data/CCSDS-103.0-B-2.xml" }
+  end
+
+  subject { RelatonCcsds::TestHitCollection.new(id) }
+
   context "#fetch" do
-    it "success" do
-      index = double "index"
-      row = { id: "CCSDS 123", file: "file.yaml" }
-      expect(index).to receive(:search).with("CCSDS 123").and_return [row]
-      expect(subject).to receive(:index).and_return index
-      url = "https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/file.yaml"
-      expect(RelatonCcsds::Hit).to receive(:new).with(code: "CCSDS 123", url: url).and_return :hit
-      expect(subject.fetch).to be_instance_of RelatonCcsds::HitCollection
-      expect(subject.first).to eq :hit
+    before { subject.fetch }
+
+    let(:id) { "CCSDS 103.0-B-2" }
+
+    it "returns matching hit" do
+      expect(subject[0].code).to eq(Pubid::Ccsds::Identifier.parse(id))
     end
 
-    it "raise RelatonBib::RequestError" do
-      expect(subject).to receive(:index).and_raise OpenURI::HTTPError.new("error", nil)
-      expect { subject.fetch }.to raise_error RelatonBib::RequestError
+    context "when reference without edition" do
+      let(:match_identifiers) { ["CCSDS 103.0-B-1", "CCSDS 103.0-B-2"] }
+      let(:id) { "CCSDS 103.0-B" }
+
+      it "returns identifiers related to reference" do
+        expect(subject.map(&:code).map(&:to_s)).to eq(match_identifiers)
+      end
+    end
+
+    # implementation testing, do we need this?
+    context "when HTTP error occurs" do
+      it "raise RelatonBib::RequestError" do
+        expect(subject).to receive(:index).and_raise OpenURI::HTTPError.new("error", nil)
+        expect { subject.fetch }.to raise_error RelatonBib::RequestError
+      end
     end
   end
 end
