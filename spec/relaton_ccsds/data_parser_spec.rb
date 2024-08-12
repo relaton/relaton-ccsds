@@ -13,8 +13,18 @@ describe RelatonCcsds::DataParser do
 
     context "#parse" do
       subject { RelatonCcsds::DataParser.new(doc, docs).parse }
+
       it { is_expected.to be_a(RelatonCcsds::BibliographicItem) }
       it { expect(subject.docidentifier.first.id).to eq(identifier) }
+      it { expect(subject.title.first.title.content).to eq("Lossless Data Compression") }
+      it { expect(subject.doctype.type).to eq("standard") }
+      it { expect(subject.date.first.on).to eq("2020-08") }
+      it { expect(subject.status.stage.value).to eq("published") }
+      it { expect(subject.link.first.content.to_s).to eq("https://public.ccsds.org/Pubs/121x0b3.pdf") }
+      it { expect(subject.edition.content).to eq("3") }
+      it { expect(subject.relation.first.bibitem.docidentifier.first.id).to eq("ISO 15887") }
+      it { expect(subject.editorialgroup.to_hash).to eq([{ "name" => "SLS-MHDC" }]) }
+      it { expect(subject.technology_area).to eq("Space Link Services Area") }
     end
 
     it "#parse_title" do
