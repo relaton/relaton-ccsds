@@ -23,7 +23,7 @@ module RelatonCcsds
     end
 
     def index
-      @index ||= Relaton::Index.find_or_create :ccsds, url: "#{GHURL}index-v2.zip", file: INDEX_FILE
+      @index ||= Relaton::Index.find_or_create :ccsds, url: "#{GHURL}index-v2.zip", file: INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
     end
   end
 end
