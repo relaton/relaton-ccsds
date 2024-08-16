@@ -1,3 +1,17 @@
+describe RelatonCcsds::Bibliography do
+  # integration test
+  context "#get" do
+    it "returns correct xml", vcr: "ccsds_230_2-g-1" do
+      doc = described_class.get "CCSDS 230.2-G-1"
+      xml = doc.to_xml bibdata: true
+      file = "spec/fixtures/ccsds_230_2-g-1.xml"
+      File.write file, xml, encoding: "UTF-8" unless File.exist? file
+      expect(xml).to be_equivalent_to File.read(file, encoding: "UTF-8")
+                                          .sub(%r{(?<=<fetched>)\d{4}-\d{2}-\d{2}}, Date.today.to_s)
+    end
+  end
+end
+
 class RelatonCcsds::TestHitCollection < RelatonCcsds::HitCollection
   # override default index method to avoid index downloading
   def index
