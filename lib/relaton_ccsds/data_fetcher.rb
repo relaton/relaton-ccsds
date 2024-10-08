@@ -123,6 +123,8 @@ module RelatonCcsds
       File.write file, content(bib), encoding: "UTF-8"
       index.add_or_update Pubid::Ccsds::Identifier.parse(bib.docidentifier.first.id), file
       old_index.add_or_update bib.docidentifier.first.id, file
+    rescue StandardError => e
+      puts "Failed to save #{bib.docidentifier.first.id}: #{e.message}\n#{e.backtrace[0..5].join("\n")}"
     end
 
     #
