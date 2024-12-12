@@ -35,9 +35,9 @@ docstatus:
   stage:
     value: published
 fetched: '2023-08-25'
-doctype:
-  type: report
-editorialgroup:
-- name: SLS-NGU
 ext:
   technology_area: Space Link Services Area
+  doctype:
+    type: report
+  editorialgroup:
+  - name: SLS-NGU

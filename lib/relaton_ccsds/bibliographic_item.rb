@@ -41,6 +41,10 @@ module RelatonCcsds
       hash
     end
 
+    def has_ext?
+      super || technology_area
+    end
+
     def to_format(format)
       return self unless format
 
