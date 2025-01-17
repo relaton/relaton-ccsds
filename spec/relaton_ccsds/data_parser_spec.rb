@@ -133,23 +133,63 @@ describe RelatonCcsds::DataParser do
       end
     end
 
-    context "successor" do
-      it "doesn't have successor" do
-        expect(subject.successor).to eq []
+    describe "successor parameter" do
+      let(:doc) { JSON.parse File.read "spec/fixtures/doc_retired.json" }
+      let(:identifier) { "CCSDS 211.0-B-5" }
+      let(:retired_identifier) { "CCSDS 211.0-B-5-S" }
+
+      context "when successor == true" do
+        subject { RelatonCcsds::DataParser.new(doc, docs, successor: true).parse }
+
+        it "don't have retired status" do
+          # -S (Silver book) should be removed
+          expect(subject.docidentifier.first.id).to eq(identifier)
+        end
+        it "has retired status" do
+          expect(subject.status.stage.value).to eq("withdrawn")
+        end
+
+        it "has relation to original document" do
+          # there are two relations - "adoptedAs" and "hasSuccessor", lookup only for hasSuccessor
+          retired_bibitem = subject.relation.select { |r| r.type == "hasSuccessor" }.first.bibitem
+          expect(retired_bibitem.docidentifier.first.id).to eq(retired_identifier)
+          # expect(subject.relation.first.type).to eq("hasSuccessor")
+        end
       end
 
-      it "has successor" do
-        docid = double "docid", id: :successor_id
-        successor_rel = double "relation"
-        successor = double "successor", docidentifier: [docid], relation: successor_rel
-        expect(successor_rel).to receive(:<<).with(:predecessor)
-        subject.instance_variable_set :@successor, successor
-        expect(subject).to receive(:docidentifier).and_return :docid
-        expect(subject).to receive(:create_relation).with("successorOf", :docid).and_return :predecessor
-        expect(subject).to receive(:create_relation).with("hasSuccessor", :successor_id).and_return :successor
-        expect(subject.successor).to eq [:successor]
+      context "when successor == false" do
+        subject { RelatonCcsds::DataParser.new(doc, docs, successor: false).parse }
+
+        it "have retired status" do
+          # -S (Silver book) should be removed
+          expect(subject.docidentifier.first.id).to eq(retired_identifier)
+        end
+
+        # check there is no hasSuccessor relations
+        it { expect(subject.relation.select { |r| r.type == "hasSuccessor" }.size).to eq(0) }
       end
     end
+
+
+
+
+    # context "successor" do
+    #   it "doesn't have successor" do
+    #     expect(subject.successor).to eq []
+    #   end
+    #
+    #   it "has successor" do
+    #     docid = double "docid", id: :successor_id
+    #     successor_rel = double "relation"
+    #     successor = double "successor", docidentifier: [docid], relation: successor_rel
+    #     expect(successor_rel).to receive(:<<).with(:predecessor)
+    #     subject.instance_variable_set :@successor, successor
+    #     expect(subject).to receive(:docidentifier).and_return :docid
+    #     expect(subject).to receive(:create_relation).with("successorOf", :docid).and_return :predecessor
+    #     expect(subject).to receive(:create_relation).with("hasSuccessor", :successor_id).and_return :successor
+    #     expect(subject.successor).to eq [:successor]
+    #   end
+    # end
 
     context "#relation_type" do
       context "hasEdition" do

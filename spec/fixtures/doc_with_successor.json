@@ -1,0 +1,54 @@
+{
+  "Document_x0020_Number": "CCSDS 650.0-B-1-S",
+  "Title": [
+    {
+      "title": {
+        "content": "Example Document with Successor",
+        "language": ["en"],
+        "script": ["Latn"]
+      }
+    }
+  ],
+  "doctype": {
+    "type": "standard"
+  },
+  "date": [
+    {
+      "type": "published",
+      "on": "2023-01"
+    }
+  ],
+  "status": {
+    "stage": {
+      "value": "withdrawn"
+    }
+  },
+  "link": [
+    {
+      "type": "pdf",
+      "content": "https://example.com/document.pdf"
+    }
+  ],
+  "edition": {
+    "content": "1"
+  },
+  "relation": [
+    {
+      "type": "hasSuccessor",
+      "bibitem": {
+        "docidentifier": [
+          {
+            "id": "successor_id"
+          }
+        ]
+      }
+    }
+  ],
+  "editorialgroup": [
+    {
+      "name": "SLS-MHDC"
+    }
+  ],
+  "Technology_x0020_Area": "Space Link Services Area",
+  "Working_x0020_Group": "Example Working Group"
+}
