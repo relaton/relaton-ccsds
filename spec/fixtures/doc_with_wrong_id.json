@@ -1,0 +1,35 @@
+{
+  "__metadata": {
+      "id": "3b262741-6a6b-4c3f-836b-96607e47b02f",
+      "uri": "https://public.ccsds.org/_api/Web/Lists(guid'867cc153-c4fe-4692-b3a3-4bb0e2107538')/Items(454)",
+      "etag": "\"8\"",
+      "type": "SP.Data.PubsItem"
+  },
+  "Document_x0020_Number": "CCSDS WRONG.1-2-3",
+  "Dcoument_x0020_Title": "Lossless Data Compression",
+  "Book_x0020_Type": "Blue Book",
+  "Description0": "The Recommended Standard for Lossless Data Compression defines a source-coding data-compression algorithm and specifies how data compressed using the algorithm are inserted into source packets for retrieval and decoding.  The current update addresses potential ambiguities and adds an option for a file header.",
+  "Issue_x0020_Number": "3",
+  "ISO_x0020_Number": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "ISO Equivalent : 15887",
+      "Url": "https://www.iso.org/standard/62314.html?browse=tc"
+  },
+  "Patents": null,
+  "Extra_x0020_Link": null,
+  "Working_x0020_Group": {
+      "__metadata": {
+          "type": "SP.FieldUrlValue"
+      },
+      "Description": "SLS-MHDC",
+      "Url": "https://cwe.ccsds.org/sls/default.aspx#_SLS-MHDC"
+  },
+  "Area": "SLS",
+  "calActive": "Active",
+  "calHtmlColorCode": "#0066FF",
+  "calPublishedMonth": "August",
+  "calPublishedYear": "2020",
+  "FileRef": "/Pubs/121x0b3.pdf"
+}

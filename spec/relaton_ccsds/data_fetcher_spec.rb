@@ -108,6 +108,15 @@ describe RelatonCcsds::DataFetcher do
               .to eq("CCSDS 211.0-B-5-S")
           end
         end
+
+      end
+
+      context "when document identifier is wrong" do
+        let(:doc) { JSON.parse File.read "spec/fixtures/doc_with_wrong_id.json" }
+
+        it "prints error instead of raising an exception" do
+          expect { subject }.to output(/^Failed to save/).to_stdout
+        end
       end
 
       context "when format bibxml" do

@@ -110,14 +110,14 @@ module RelatonCcsds
       search_instance_translation bib
       merge_links bib, get_output_file(bib)
       super(bib)
-    rescue Errno::EACCES, Errno::ENOENT, Errno::ENOSPC, IOError => e
-      puts "Failed to save #{bib.docidentifier.first.id}: #{e.message}\n#{e.backtrace[0..5].join("\n")}"
     end
 
     def index_add_or_update(bib)
       super
 
       old_index.add_or_update bib.docidentifier.first.id, get_output_file(bib)
+    rescue Pubid::Core::Errors::ParseError => e
+      puts "Failed to save #{bib.docidentifier.first.id}: #{e.message}\n#{e.backtrace[0..5].join("\n")}"
     end
 
     #
