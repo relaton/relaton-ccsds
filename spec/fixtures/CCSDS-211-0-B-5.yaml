@@ -1,0 +1,120 @@
+---
+schema-version: v1.2.9
+id: CCSDS211.0-B-5
+title:
+- content: Proximity-1 Space Link Protocol--Data Link Layer
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+link:
+- content: https://public.ccsds.org/Pubs/211x0b5s.pdf
+  type: pdf
+docid:
+- id: CCSDS 211.0-B-5
+  type: CCSDS
+  primary: true
+date:
+- type: published
+  value: 2013-12
+edition:
+  content: '5'
+revdate: 2013-12
+abstract:
+- content: The CCSDS Recommended Standard for Proximity-1 Space Link Protocol—Data
+    Link Layer specifies the protocol, services, and procedures pertaining to the
+    CCSDS Version-3 Transfer Frame.  The current issue includes several improvements
+    and clarifications—accomplishing better alignment and consistency with the other
+    Proximity-1 Blue Books—and the addition of an option for Low Density Parity-Check
+    (LDPC) codes.
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+docstatus:
+  stage:
+    value: withdrawn
+relation:
+- type: hasSuccessor
+  bibitem:
+    id: CCSDS211.0-B-5-S
+    title:
+    - content: Proximity-1 Space Link Protocol--Data Link Layer
+      language:
+      - en
+      script:
+      - Latn
+      format: text/plain
+    link:
+    - content: https://public.ccsds.org/Pubs/211x0b5s.pdf
+      type: pdf
+    docid:
+    - id: CCSDS 211.0-B-5-S
+      type: CCSDS
+      primary: true
+    date:
+    - type: published
+      value: 2013-12
+    edition:
+      content: '5'
+    revdate: 2013-12
+    abstract:
+    - content: The CCSDS Recommended Standard for Proximity-1 Space Link Protocol—Data
+        Link Layer specifies the protocol, services, and procedures pertaining to
+        the CCSDS Version-3 Transfer Frame.  The current issue includes several improvements
+        and clarifications—accomplishing better alignment and consistency with the
+        other Proximity-1 Blue Books—and the addition of an option for Low Density
+        Parity-Check (LDPC) codes.
+      language:
+      - en
+      script:
+      - Latn
+      format: text/plain
+    docstatus:
+      stage:
+        value: published
+    relation:
+    - type: adoptedAs
+      bibitem:
+        id: ISO22663
+        docid:
+        - id: ISO 22663
+          type: CCSDS
+          primary: true
+        formattedref:
+          content: ISO 22663
+          format: text/plain
+    - type: successorOf
+      bibitem:
+        id: CCSDS211.0-B-5
+        docid:
+        - id: CCSDS 211.0-B-5
+          type: CCSDS
+          primary: true
+        formattedref:
+          content: CCSDS 211.0-B-5
+          format: text/plain
+    ext:
+      doctype:
+        type: standard
+      editorialgroup:
+      - name: SLS-SLP
+      technology_area: Space Link Services Area
+- type: adoptedAs
+  bibitem:
+    id: ISO22663
+    docid:
+    - id: ISO 22663
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: ISO 22663
+      format: text/plain
+ext:
+  doctype:
+    type: standard
+  editorialgroup:
+  - name: SLS-SLP
+  technology_area: Space Link Services Area

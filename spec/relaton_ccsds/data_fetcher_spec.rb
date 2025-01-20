@@ -89,6 +89,11 @@ describe RelatonCcsds::DataFetcher do
           expect(data_fetcher.index.index.first[:file]).to eq("#{@output_dir}/CCSDS-121-0-B-3.yaml")
         end
 
+        it "stores yaml files" do
+          expect(File.read "#{@output_dir}/CCSDS-121-0-B-3.yaml").to eq(File.read("spec/fixtures/CCSDS-121-0-B-3.yaml"))
+        end
+
+
         context "when retired true" do
           let(:doc) { JSON.parse File.read "spec/fixtures/doc_retired.json" }
           let(:retired) { true }
@@ -106,6 +111,11 @@ describe RelatonCcsds::DataFetcher do
           it "creates relation to predecessor" do
             expect(subject.relation.select { |r| r.type == "hasSuccessor" }.first.bibitem.docidentifier.first.id)
               .to eq("CCSDS 211.0-B-5-S")
+          end
+
+          it "stores yaml files" do
+            expect(File.read "#{@output_dir}/CCSDS-211-0-B-5.yaml").to eq(File.read("spec/fixtures/CCSDS-211-0-B-5.yaml"))
+            expect(File.read "#{@output_dir}/CCSDS-211-0-B-5-S.yaml").to eq(File.read("spec/fixtures/CCSDS-211-0-B-5-S.yaml"))
           end
         end
 
