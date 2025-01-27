@@ -1,0 +1,29 @@
+{
+  "__metadata": {
+    "id": "d68fb050-e702-4bb1-9f2a-da5031267bb8",
+    "uri": "https://public.ccsds.org/_api/Web/Lists(guid'867cc153-c4fe-4692-b3a3-4bb0e2107538')/Items(383)",
+    "etag": "\"13\"",
+    "type": "SP.Data.PubsItem"
+  },
+  "Document_x0020_Number": "CCSDS 551.1-O-2 - Russian Translated",
+  "Dcoument_x0020_Title": "ФОРМИРОВАНИЕ ОБОБЩЁННЫХ ДАННЫХ",
+  "Book_x0020_Type": "Orange Book",
+  "Description0": "«Представлена технология формирования обобщённых данных с использованием данных, сфор-мированных по правилам CCSDS и полученных по каналам разнесения, базирующаяся на разне-сённом приёме и обеспечивающая улучшение достоверности данных». ",
+  "Issue_x0020_Number": "1",
+  "ISO_x0020_Number": null,
+  "Patents": null,
+  "Extra_x0020_Link": null,
+  "Working_x0020_Group": {
+    "__metadata": {
+      "type": "SP.FieldUrlValue"
+    },
+    "Description": "MOIMS-SM&C",
+    "Url": "https://cwe.ccsds.org/moims/default.aspx#_MOIMS-SM&C"
+  },
+  "Area": "None",
+  "calActive": "Active",
+  "calHtmlColorCode": "#FF6600",
+  "calPublishedMonth": "August",
+  "calPublishedYear": "2020",
+  "FileRef": "/Pubs/551x1o2e1(R).pdf"
+}

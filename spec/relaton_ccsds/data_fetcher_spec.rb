@@ -85,14 +85,80 @@ describe RelatonCcsds::DataFetcher do
         end
 
         it "adds file to index" do
-          expect(data_fetcher.index.index.first[:id]).to eq("CCSDS 121.0-B-3")
-          expect(data_fetcher.index.index.first[:file]).to eq("#{@output_dir}/CCSDS-121-0-B-3.yaml")
+          expect(data_fetcher.index.index).to include(
+            { id: "CCSDS 121.0-B-3", file: "#{@output_dir}/CCSDS-121-0-B-3.yaml" })
+
         end
 
         it "stores yaml files" do
           expect(File.read "#{@output_dir}/CCSDS-121-0-B-3.yaml").to eq(File.read("spec/fixtures/CCSDS-121-0-B-3.yaml"))
         end
 
+        context "when translation" do
+          let(:doc) { JSON.parse File.read("spec/fixtures/ccsds_551_1-O-2_russian_translated.json") }
+          let(:retired) { false }
+
+          it "stores identifier" do
+            expect(data_fetcher.index.index).to include(
+              { id: "CCSDS 551.1-O-2 - Russian Translated", file: "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml" })
+          end
+
+          it "stores yaml files" do
+            expect(File.read "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml").to eq(File.read("spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml"))
+          end
+
+          context "when file already exists and indexed" do
+            # run #parse_and_save to create file and add to index
+            before { data_fetcher.parse_and_save(doc, retired) }
+
+            it "stores yaml files" do
+              expect(File.read "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml").to eq(File.read("spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml"))
+            end
+          end
+
+          context "when there are related identifiers" do
+            let(:original_related_doc_file) { "spec/fixtures/CCSDS-551-1-O-2.yaml" }
+            let(:related_doc_file) { "#{@output_dir}/CCSDS-551-1-O-2.yaml" }
+
+            before do
+              FileUtils.cp(original_related_doc_file, related_doc_file)
+              # add file to index
+              data_fetcher.index.add_or_update(data_fetcher.class.get_identifier_class.parse("CCSDS 551.1-O-2"), related_doc_file)
+              data_fetcher.parse_and_save(doc, retired)
+            end
+
+            it "stores yaml files" do
+              expect(File.read "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml").to eq(File.read("spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml"))
+            end
+          end
+        end
+
+        context "when have related translation in index" do
+          let(:doc) { JSON.parse File.read("spec/fixtures/ccsds_551_1-O-2.json") }
+          let(:retired) { false }
+          let(:original_translated_file) { "spec/fixtures/CCSDS-551-1-O-2-Russian-Translated-without-relation.yaml" }
+          let(:original_translated_file_with_relation) { "spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml" }
+          let(:translated_file) { "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml" }
+
+          before do
+            FileUtils.cp(original_translated_file, translated_file)
+            # add file to index
+            data_fetcher.index.add_or_update(data_fetcher.class.get_identifier_class.parse("CCSDS 551.1-O-2 - Russian Translated"), translated_file)
+            data_fetcher.parse_and_save(doc, retired)
+          end
+
+          it "adds relation to translated document" do
+            expect(File.read(translated_file)).to eq(File.read(original_translated_file_with_relation))
+          end
+
+          context "when relation already added" do
+            let(:original_translated_file) { "spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml" }
+
+            it "don't add relation again" do
+              expect(File.read(translated_file)).to eq(File.read(original_translated_file))
+            end
+          end
+        end
 
         context "when retired true" do
           let(:doc) { JSON.parse File.read "spec/fixtures/doc_retired.json" }
