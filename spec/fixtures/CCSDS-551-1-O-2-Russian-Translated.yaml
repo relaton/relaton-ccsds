@@ -1,0 +1,52 @@
+---
+schema-version: v1.2.9
+id: CCSDS551.1-O-2-RussianTranslated
+title:
+- content: ФОРМИРОВАНИЕ ОБОБЩЁННЫХ ДАННЫХ
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+link:
+- content: https://public.ccsds.org/Pubs/551x1o2e1(R).pdf
+  type: pdf
+docid:
+- id: CCSDS 551.1-O-2 - Russian Translated
+  type: CCSDS
+  primary: true
+date:
+- type: published
+  value: 2020-08
+edition:
+  content: '1'
+revdate: 2020-08
+abstract:
+- content: "«Представлена технология формирования обобщённых данных с использованием
+    данных, сфор-мированных по правилам CCSDS и полученных по каналам разнесения,
+    базирующаяся на разне-сённом приёме и обеспечивающая улучшение достоверности данных». "
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+docstatus:
+  stage:
+    value: published
+relation:
+- type: instanceOf
+  bibitem:
+    id: CCSDS551.1-O-2
+    docid:
+    - id: CCSDS 551.1-O-2
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2
+      format: text/plain
+ext:
+  doctype:
+    type: specification
+  editorialgroup:
+  - name: MOIMS-SM&C
+  technology_area: Mission Operations and Information Management Services Area

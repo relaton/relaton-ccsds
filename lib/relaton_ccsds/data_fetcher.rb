@@ -1,5 +1,5 @@
 module RelatonCcsds
-  class DataFetcher
+  class DataFetcher < Relaton::Core::DataFetcher
     ACTIVE_PUBS_URL = <<~URL.freeze
       https://public.ccsds.org/_api/web/lists/getbytitle('CCSDS%20Publications')/items?$top=1000&$select=Dcoument_x0020_Title,
       Document_x0020_Number,Book_x0020_Type,Issue_x0020_Number,calPublishedMonth,calPublishedYear,Description0,Working_x0020_Group,
@@ -17,17 +17,11 @@ module RelatonCcsds
 
     TRRGX = /\s-\s\w+\sTranslated$/.freeze
 
-    #
-    # Initialize fetcher
-    #
-    # @param [String] output path to output directory
-    # @param [String] format output format (yaml, xml, bibxml)
-    #
-    def initialize(output, format)
-      @output = output
-      @format = format
-      @ext = format.sub "bibxml", "xml"
-      @files = []
+    INDEX_TYPE = "CCSDS"
+    INDEX_FILE = "index-v2.yaml"
+
+    def self.get_identifier_class
+      Pubid::Ccsds::Identifier
     end
 
     def agent
@@ -38,12 +32,8 @@ module RelatonCcsds
       @agent
     end
 
-    def index
-      @index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v2.yaml", pubid_class: Pubid::Ccsds::Identifier
-    end
-
     def old_index
-      @old_index ||= Relaton::Index.find_or_create "CCSDS", file: "index-v1.yaml"
+      @old_index ||= Relaton::Index.find_or_create INDEX_TYPE, file: "index-v1.yaml"
     end
 
     #
@@ -54,15 +44,6 @@ module RelatonCcsds
     #
     # @return [void]
     #
-    def self.fetch(output: "data", format: "yaml")
-      t1 = Time.now
-      puts "Started at: #{t1}"
-      FileUtils.mkdir_p output
-      new(output, format).fetch
-      t2 = Time.now
-      puts "Stopped at: #{t2}"
-      puts "Done in: #{(t2 - t1).round} sec."
-    end
 
     def fetch
       fetch_docs ACTIVE_PUBS_URL
@@ -81,10 +62,18 @@ module RelatonCcsds
     #
     def fetch_docs(url, retired: false)
       resp = agent.get(url)
-      json = JSON.parse resp.body
-      @array = json["d"]["results"].map do |doc|
-        parse_and_save doc, json["d"]["results"], retired
+      @docs = JSON.parse(resp.body)["d"]["results"]
+      @docs.map do |doc|
+        parse_and_save doc, retired
       end
+    end
+
+    # Parse hash and return RelatonBib
+    # @param [Hash] doc document data
+    # @param [Boolean] successor
+    # @return [RelatonBib]
+    def parse(doc, successor: false)
+      DataParser.new(doc, docs, successor: successor).parse
     end
 
     #
@@ -96,17 +85,18 @@ module RelatonCcsds
     #
     # @return [void]
     #
-    def parse_and_save(doc, results, retired)
-      bibitem = DataParser.new(doc, results).parse
-      if retired
-        predecessor = DataParser.new(doc, results, bibitem).parse
-        save_bib predecessor
-      end
-      save_bib bibitem
-    end
+    def parse_and_save(doc, retired)
+      return super(doc) unless retired
 
-    def get_output_file(id)
-      File.join @output, "#{id.gsub(/[.\s-]+/, '-')}.#{@ext}"
+      # If retired, parse and save the predecessor
+      successor = parse(doc, successor: true)
+
+      predecessor = successor.relation.select { |r| r.type == "hasSuccessor" }.first.bibitem
+      save_bib(successor)
+      save_bib(predecessor)
+      index_add_or_update(successor)
+      index_add_or_update(predecessor)
+      successor
     end
 
     #
@@ -118,12 +108,15 @@ module RelatonCcsds
     #
     def save_bib(bib)
       search_instance_translation bib
-      file = get_output_file(bib.docidentifier.first.id)
-      merge_links bib, file
-      File.write file, content(bib), encoding: "UTF-8"
-      index.add_or_update Pubid::Ccsds::Identifier.parse(bib.docidentifier.first.id), file
-      old_index.add_or_update bib.docidentifier.first.id, file
-    rescue StandardError => e
+      merge_links bib, get_output_file(bib)
+      super(bib)
+    end
+
+    def index_add_or_update(bib)
+      super
+
+      old_index.add_or_update bib.docidentifier.first.id, get_output_file(bib)
+    rescue Pubid::Core::Errors::ParseError => e
       puts "Failed to save #{bib.docidentifier.first.id}: #{e.message}\n#{e.backtrace[0..5].join("\n")}"
     end
 
@@ -185,7 +178,7 @@ module RelatonCcsds
       type1, type2 = translation_relation_types(inst)
       bib.relation << create_relation(inst, type1)
       inst.relation << create_relation(bib, type2)
-      File.write file, content(inst), encoding: "UTF-8"
+      File.write file, serialize(inst), encoding: "UTF-8"
     end
 
     #
@@ -216,7 +209,7 @@ module RelatonCcsds
       inst = BibliographicItem.from_hash hash
       bib.relation << create_relation(inst, "hasInstance")
       inst.relation << create_relation(bib, "instanceOf")
-      File.write file, content(inst), encoding: "UTF-8"
+      File.write file, serialize(inst), encoding: "UTF-8"
     end
 
     #
@@ -250,6 +243,8 @@ module RelatonCcsds
 
       puts "(#{file}) file already exists. Trying to merge links ..."
 
+      raise Errors::TypeError, "cannot merge links for #{@format}" if @format != "yaml"
+
       hash = YAML.load_file file
       bib2 = BibliographicItem.from_hash hash
       if bib.link[0].type == bib2.link[0].type
@@ -258,21 +253,6 @@ module RelatonCcsds
       end
       Util.info "links are merged.", key: file
       bib.link << bib2.link[0]
-    end
-
-    #
-    # Srerialize bibliographic item
-    #
-    # @param [RelatonCcsds::BibliographicItem] bib <description>
-    #
-    # @return [String] serialized bibliographic item
-    #
-    def content(bib)
-      case @format
-      when "yaml" then bib.to_hash.to_yaml
-      when "xml" then bib.to_xml(bibdata: true)
-      else bib.send "to_#{@format}"
-      end
     end
   end
 end

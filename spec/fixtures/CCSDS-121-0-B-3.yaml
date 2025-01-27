@@ -1,0 +1,53 @@
+---
+schema-version: v1.2.9
+id: CCSDS121.0-B-3
+title:
+- content: Lossless Data Compression
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+link:
+- content: https://public.ccsds.org/Pubs/121x0b3.pdf
+  type: pdf
+docid:
+- id: CCSDS 121.0-B-3
+  type: CCSDS
+  primary: true
+date:
+- type: published
+  value: 2020-08
+edition:
+  content: '3'
+revdate: 2020-08
+abstract:
+- content: The Recommended Standard for Lossless Data Compression defines a source-coding
+    data-compression algorithm and specifies how data compressed using the algorithm
+    are inserted into source packets for retrieval and decoding.  The current update
+    addresses potential ambiguities and adds an option for a file header.
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+docstatus:
+  stage:
+    value: published
+relation:
+- type: adoptedAs
+  bibitem:
+    id: ISO15887
+    docid:
+    - id: ISO 15887
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: ISO 15887
+      format: text/plain
+ext:
+  doctype:
+    type: standard
+  editorialgroup:
+  - name: SLS-MHDC
+  technology_area: Space Link Services Area

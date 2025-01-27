@@ -1,6 +1,43 @@
 describe RelatonCcsds::DataFetcher do
-  subject { RelatonCcsds::DataFetcher.new "data", "bibxml" }
+  # let(:data_fetcher) { RelatonCcsds::DataFetcher.new "data", "bibxml" }
+  let(:data_fetcher) { RelatonCcsds::DataFetcher.new @output_dir, format }
+  before(:all) { @output_dir = Dir.mktmpdir }
+
+  after(:all) { FileUtils.remove_entry_secure(@output_dir) }
+
+  subject { data_fetcher }
   let(:identifier) { "CCSDS 123.0-B-1" }
+  let(:bib) { RelatonCcsds::BibliographicItem.new(docid: [RelatonBib::DocumentIdentifier.new(id: identifier)]) }
+  let(:format) { "bibxml" }
+
+  describe "#parse" do
+    subject { data_fetcher.parse(doc) }
+    let(:doc) { JSON.parse File.read "spec/fixtures/doc_with_iso.json" }
+    let(:identifier) { "CCSDS 121.0-B-3" }
+
+    it "returns bib object" do
+      expect(subject.docidentifier.first.id).to eq(identifier)
+    end
+
+    context "document with relations" do
+      let(:doc) { JSON.parse File.read "spec/fixtures/doc_has_edition.json" }
+      let(:doc_edition_of) { JSON.parse File.read "spec/fixtures/doc_edition_of.json" }
+
+      before do
+        data_fetcher.docs = [doc, doc_edition_of]
+      end
+
+      it "has adoptedAs relation" do
+        expect(subject.relation.map { |r| [r.type, r.bibitem.docidentifier.first.id] })
+          .to include(["adoptedAs", "ISO 18381"])
+      end
+
+      it "updated by corrigenda" do
+        expect(subject.relation.map { |r| [r.type, r.bibitem.docidentifier.first.id] })
+          .to include(["updatedBy", "CCSDS 123.0-B-2 Cor. 2"])
+      end
+    end
+  end
 
   context "#fetch" do
     it "fetches data" do
@@ -10,13 +47,6 @@ describe RelatonCcsds::DataFetcher do
       expect(described_class).to receive(:new).with("data", "yaml").and_return df
       described_class.fetch
     end
-  end
-
-  it "initialize" do
-    expect(subject.instance_variable_get(:@output)).to eq "data"
-    expect(subject.instance_variable_get(:@format)).to eq "bibxml"
-    expect(subject.instance_variable_get(:@ext)).to eq "xml"
-    expect(subject.instance_variable_get(:@files)).to eq []
   end
 
   context "instance methods" do
@@ -35,88 +65,199 @@ describe RelatonCcsds::DataFetcher do
     it "#fetch_docs" do
       body = { "d" => { "results" => ["doc"] } }.to_json
       expect(subject.agent).to receive(:get).with(:url).and_return double(body: body)
-      expect(subject).to receive(:parse_and_save).with("doc", ["doc"], false)
+      expect(subject).to receive(:parse_and_save).with("doc", false)
       subject.fetch_docs :url
     end
 
     context "#parse_and_save" do
-      before do
-        dp = double(:dataparser, parse: :bibitem)
-        expect(RelatonCcsds::DataParser).to receive(:new).with(:doc, []).and_return dp
-        expect(subject).to receive(:save_bib).with(:bibitem)
+      subject { data_fetcher.parse_and_save(doc, retired) }
+      let(:retired) { false }
+      let(:format) { "bibxml" }
+      let(:doc) { JSON.parse File.read "spec/fixtures/doc_with_iso.json" }
+
+      context "when format yaml" do
+        before { subject }
+        let(:format) { "yaml" }
+
+        it "saves parsed data in correct format" do
+          result = File.read("#{@output_dir}/CCSDS-121-0-B-3.yaml")
+          expect(result).to eq(File.read("spec/fixtures/CCSDS-121-0-B-3.yaml"))
+        end
+
+        it "adds file to index" do
+          expect(data_fetcher.index.index).to include(
+            { id: "CCSDS 121.0-B-3", file: "#{@output_dir}/CCSDS-121-0-B-3.yaml" })
+
+        end
+
+        it "stores yaml files" do
+          expect(File.read "#{@output_dir}/CCSDS-121-0-B-3.yaml").to eq(File.read("spec/fixtures/CCSDS-121-0-B-3.yaml"))
+        end
+
+        context "when translation" do
+          let(:doc) { JSON.parse File.read("spec/fixtures/ccsds_551_1-O-2_russian_translated.json") }
+          let(:retired) { false }
+
+          it "stores identifier" do
+            expect(data_fetcher.index.index).to include(
+              { id: "CCSDS 551.1-O-2 - Russian Translated", file: "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml" })
+          end
+
+          it "stores yaml files" do
+            expect(File.read "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml").to eq(File.read("spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml"))
+          end
+
+          context "when file already exists and indexed" do
+            # run #parse_and_save to create file and add to index
+            before { data_fetcher.parse_and_save(doc, retired) }
+
+            it "stores yaml files" do
+              expect(File.read "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml").to eq(File.read("spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml"))
+            end
+          end
+
+          context "when there are related identifiers" do
+            let(:original_related_doc_file) { "spec/fixtures/CCSDS-551-1-O-2.yaml" }
+            let(:related_doc_file) { "#{@output_dir}/CCSDS-551-1-O-2.yaml" }
+
+            before do
+              FileUtils.cp(original_related_doc_file, related_doc_file)
+              # add file to index
+              data_fetcher.index.add_or_update(data_fetcher.class.get_identifier_class.parse("CCSDS 551.1-O-2"), related_doc_file)
+              data_fetcher.parse_and_save(doc, retired)
+            end
+
+            it "stores yaml files" do
+              expect(File.read "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml").to eq(File.read("spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml"))
+            end
+          end
+        end
+
+        context "when have related translation in index" do
+          let(:doc) { JSON.parse File.read("spec/fixtures/ccsds_551_1-O-2.json") }
+          let(:retired) { false }
+          let(:original_translated_file) { "spec/fixtures/CCSDS-551-1-O-2-Russian-Translated-without-relation.yaml" }
+          let(:original_translated_file_with_relation) { "spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml" }
+          let(:translated_file) { "#{@output_dir}/CCSDS-551-1-O-2-Russian-Translated.yaml" }
+
+          before do
+            FileUtils.cp(original_translated_file, translated_file)
+            # add file to index
+            data_fetcher.index.add_or_update(data_fetcher.class.get_identifier_class.parse("CCSDS 551.1-O-2 - Russian Translated"), translated_file)
+            data_fetcher.parse_and_save(doc, retired)
+          end
+
+          it "adds relation to translated document" do
+            expect(File.read(translated_file)).to eq(File.read(original_translated_file_with_relation))
+          end
+
+          context "when relation already added" do
+            let(:original_translated_file) { "spec/fixtures/CCSDS-551-1-O-2-Russian-Translated.yaml" }
+
+            it "don't add relation again" do
+              expect(File.read(translated_file)).to eq(File.read(original_translated_file))
+            end
+          end
+        end
+
+        context "when retired true" do
+          let(:doc) { JSON.parse File.read "spec/fixtures/doc_retired.json" }
+          let(:retired) { true }
+
+          it "stores successor" do
+            expect(data_fetcher.index.index).to include(
+              { id: "CCSDS 211.0-B-5", file: "#{@output_dir}/CCSDS-211-0-B-5.yaml" })
+          end
+
+          it "stores predecessor" do
+            expect(data_fetcher.index.index).to include(
+              { id: "CCSDS 211.0-B-5-S", file: "#{@output_dir}/CCSDS-211-0-B-5-S.yaml" })
+          end
+
+          it "creates relation to predecessor" do
+            expect(subject.relation.select { |r| r.type == "hasSuccessor" }.first.bibitem.docidentifier.first.id)
+              .to eq("CCSDS 211.0-B-5-S")
+          end
+
+          it "stores yaml files" do
+            expect(File.read "#{@output_dir}/CCSDS-211-0-B-5.yaml").to eq(File.read("spec/fixtures/CCSDS-211-0-B-5.yaml"))
+            expect(File.read "#{@output_dir}/CCSDS-211-0-B-5-S.yaml").to eq(File.read("spec/fixtures/CCSDS-211-0-B-5-S.yaml"))
+          end
+        end
+
       end
 
-      it "not retired" do
-        subject.parse_and_save :doc, [], false
+      context "when document identifier is wrong" do
+        let(:doc) { JSON.parse File.read "spec/fixtures/doc_with_wrong_id.json" }
+
+        it "prints error instead of raising an exception" do
+          expect { subject }.to output(/^Failed to save/).to_stdout
+        end
       end
 
-      it "retired" do
-        dp = double(:dataparser, parse: :retired_bibitem)
-        expect(RelatonCcsds::DataParser).to receive(:new).with(:doc, [], :bibitem).and_return dp
-        expect(subject).to receive(:save_bib).with(:retired_bibitem)
-        subject.parse_and_save :doc, [], true
+      context "when format bibxml" do
+        let(:format) { "bibxml" }
+        # use retired true to invoke merge_links
+        let(:retired) { true }
+
+        it "cannot merge links when format is not yaml" do
+          expect { subject }.to raise_error(RelatonCcsds::Errors::TypeError)
+        end
       end
     end
 
     describe "#get_output_file" do
-      subject { RelatonCcsds::DataFetcher.new("data", "bibxml").get_output_file(identifier) }
+      subject { data_fetcher.get_output_file(bib) }
 
-      it { expect(subject).to eq("data/CCSDS-123-0-B-1.xml") }
+      it { is_expected.to eq("#{@output_dir}/CCSDS-123-0-B-1.xml") }
     end
 
     context "#save_bib" do
       # let(:bib) { double(:bibitem, docidentifier: [double(id: identifier)]) }
       let(:bib) { RelatonCcsds::BibliographicItem.new(docid: [RelatonBib::DocumentIdentifier.new(id: identifier)]) }
       let(:id) { Pubid::Ccsds::Identifier.parse(identifier) }
-
-      before do
-        # write once when no relations, at least twice when there are relations found
-        expect(File).to receive(:write).at_least(:once)#.with("data/CCSDS-123-0-B-1.xml",
-                                             # "<reference anchor=\"CCSDS.123.0-B-1\"/>",
-                                             # encoding: "UTF-8")
-      end
-
-      it "adds identifier's parameters as hash to index" do
-        subject.save_bib(bib)
-        id_from_index = subject.index.search(id).first[:id]
-        expect(id_from_index).to eq(id)
-      end
-
-      it "adds identifier as string to old index" do
-        subject.save_bib(bib)
-        id_from_index = subject.old_index.search(identifier).first[:id]
-        expect(id_from_index).to eq(identifier)
-      end
+      let(:format) { "yaml" }
+      subject { data_fetcher.save_bib(bib) }
 
       context "when have related translations" do
         before do
-          subject.index.add_or_update(
-            Pubid::Ccsds::Identifier.parse(translated_identifier),
-            "spec/fixtures/ccsds_123_0-b-1_russian_translated.yaml"
-          )
+          # copy original file to avoid modifications
+          FileUtils.cp(original_translated_file, translated_file)
+          data_fetcher.index.add_or_update(
+            Pubid::Ccsds::Identifier.parse(translated_identifier), translated_file)
         end
 
         let(:translated_identifier) { "#{identifier} - Russian Translated" }
+        let(:original_translated_file) { "spec/fixtures/ccsds_123_0-b-1_russian_translated.yaml" }
+        let(:original_translated_file_with_relation) { "spec/fixtures/ccsds_123_0-b-1_russian_translated_with_relation.yaml" }
+        let(:translated_file) { "#{@output_dir}/ccsds_123_0-b-1_russian_translated.yaml" }
 
         it "adds identifier with translation to identifier's relation" do
-          subject.save_bib(bib)
+          subject
           expect(bib.relation.first.bibitem.docidentifier.first.id).to eq(translated_identifier)
+        end
+
+        it "updates original file with relation" do
+          subject
+          expect(File.read(translated_file)).to eq(File.read(original_translated_file_with_relation))
         end
       end
 
       context "when identifier is translation" do
         before do
-          subject.index.add_or_update(
-            Pubid::Ccsds::Identifier.parse(identifier_without_translation),
-            "spec/fixtures/ccsds_123_0-b-1.yaml"
-          )
+          # copy original file to avoid modifications
+          FileUtils.cp(original_file_without_translation, file_without_translation)
+          data_fetcher.index.add_or_update(
+            Pubid::Ccsds::Identifier.parse(identifier_without_translation), file_without_translation)
         end
 
         let(:identifier) { "CCSDS 123.0-B-1 - Russian Translated" }
+        let(:original_file_without_translation) { "spec/fixtures/ccsds_123_0-b-1.yaml" }
+        let(:file_without_translation) { "#{@output_dir}/ccsds_123_0-b-1.yaml" }
         let(:identifier_without_translation) { "CCSDS 123.0-B-1" }
 
         it "adds identifier without translation to identifier's relation" do
-          subject.save_bib(bib)
+          subject
           expect(bib.relation.first.bibitem.docidentifier.first.id).to eq(identifier_without_translation)
         end
       end
@@ -127,25 +268,25 @@ describe RelatonCcsds::DataFetcher do
 
       it "bibxml" do
         expect(bib).to receive(:send).with("to_bibxml").and_return :bibxml
-        expect(subject.content(bib)).to eq :bibxml
+        expect(subject.serialize(bib)).to eq :bibxml
       end
 
       it "yaml" do
         subject.instance_variable_set(:@format, "yaml")
         expect(bib).to receive(:to_hash).and_return "id" => "CCSDS 123.0-B-1"
-        expect(subject.content(bib)).to eq "---\nid: CCSDS 123.0-B-1\n"
+        expect(subject.serialize(bib)).to eq "---\nid: CCSDS 123.0-B-1\n"
       end
 
       it "xml" do
         subject.instance_variable_set(:@format, "xml")
         expect(bib).to receive(:to_xml).with(bibdata: true).and_return :xml
-        expect(subject.content(bib)).to eq :xml
+        expect(subject.serialize(bib)).to eq :xml
       end
     end
 
     describe "#merge_links" do
       # skip merging when new file
-      let(:data_fetcher) { RelatonCcsds::DataFetcher.new("data", "bibxml") }
+      let(:format) { "yaml" }
       subject { data_fetcher.merge_links(bib, "spec/fixtures/ccsds_123_0-b-1.yaml") }
 
       let(:hash) do
@@ -293,7 +434,7 @@ describe RelatonCcsds::DataFetcher do
       expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(:hash).and_return inst
       expect(subject).to receive(:create_relation).with(inst, "hasInstance").and_return :has_instance
       expect(subject).to receive(:create_relation).with(bib, "instanceOf").and_return :instance_of
-      expect(subject).to receive(:content).with(inst).and_return :content
+      expect(subject).to receive(:serialize).with(inst).and_return :content
       expect(File).to receive(:write).with("file.yaml", :content, encoding: "UTF-8")
       subject.create_instance_relation bib, "file.yaml"
       expect(bib.relation).to eq [:has_instance]

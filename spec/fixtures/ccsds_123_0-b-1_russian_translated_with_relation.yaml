@@ -1,0 +1,18 @@
+---
+schema-version: v1.2.9
+id: CCSDS 123.0-B-1 - Russian Translated
+link:
+- content: https://public.ccsds.org/Pubs/123x0b1.pdf
+  type: pdf
+docid:
+- id: CCSDS 123.0-B-1 - Russian Translated
+  type: CCSDS
+relation:
+- type: instanceOf
+  bibitem:
+    id: CCSDS123.0-B-1
+    docid:
+    - id: CCSDS 123.0-B-1
+    formattedref:
+      content: CCSDS 123.0-B-1
+      format: text/plain

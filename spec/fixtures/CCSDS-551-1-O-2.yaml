@@ -1,0 +1,143 @@
+---
+schema-version: v1.2.9
+id: CCSDS551.1-O-2
+title:
+- content: Correlated Data Generation
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+link:
+- content: https://public.ccsds.org/Pubs/551x1o2e2.pdf
+  type: pdf
+docid:
+- id: CCSDS 551.1-O-2
+  type: CCSDS
+  primary: true
+date:
+- type: published
+  value: 2020-08
+edition:
+  content: '2'
+revdate: 2020-08
+abstract:
+- content: |-
+    This CCSDS Experimental Specification specifies a method for correlated data generation through the use of data acquired from diverse channels.
+    <br><br>
+    A Russian Translated version of this book can be found by <a href="NonEnglishVersions.aspx">clicking here</a>.
+  language:
+  - en
+  script:
+  - Latn
+  format: text/plain
+docstatus:
+  stage:
+    value: published
+relation:
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+- type: hasInstance
+  bibitem:
+    id: CCSDS551.1-O-2-RussianTranslated
+    docid:
+    - id: CCSDS 551.1-O-2 - Russian Translated
+      type: CCSDS
+      primary: true
+    formattedref:
+      content: CCSDS 551.1-O-2 - Russian Translated
+      format: text/plain
+ext:
+  doctype:
+    type: specification
+  editorialgroup:
+  - name: MOIMS-SM&C
+  technology_area: Mission Operations and Information Management Services Area

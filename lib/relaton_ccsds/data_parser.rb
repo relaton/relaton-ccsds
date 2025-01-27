@@ -21,10 +21,13 @@ module RelatonCcsds
       "CCSDS 701.00-R-3" => "CCSDS 701.00-R-3-S", # TODO relaton/relaton-data-ccsds#8
     }.freeze
 
-    def initialize(doc, docs, successor = nil)
+    # @param successor [Boolean]
+    def initialize(doc, docs, successor: false)
       @doc = doc
       @docs = docs
-      @successor = successor
+      if successor
+        @successor = self.class.new(doc, docs).parse
+      end
     end
 
     def parse
@@ -104,7 +107,7 @@ module RelatonCcsds
       return [] unless @successor
 
       @successor.relation << create_relation("successorOf", docidentifier)
-      [create_relation("hasSuccessor", @successor.docidentifier[0].id)]
+      [create_relation("hasSuccessor", @successor)]
     end
 
     # TODO: cover this
@@ -119,10 +122,15 @@ module RelatonCcsds
       end
     end
 
-    def create_relation(type, rel_id)
-      id = RelatonBib::DocumentIdentifier.new id: rel_id, type: "CCSDS", primary: true
-      fref = RelatonBib::FormattedRef.new content: rel_id
-      bibitem = RelatonBib::BibliographicItem.new docid: [id], formattedref: fref
+    # @param [String, RelatonBib::BibliographicItem] PubID string or BibliographicItem as relation
+    def create_relation(type, rel)
+      if rel.is_a?(RelatonBib::BibliographicItem)
+        bibitem = rel
+      else
+        id = RelatonBib::DocumentIdentifier.new id: rel, type: "CCSDS", primary: true
+        fref = RelatonBib::FormattedRef.new content: rel
+        bibitem = RelatonBib::BibliographicItem.new docid: [id], formattedref: fref
+      end
       RelatonBib::DocumentRelation.new type: type, bibitem: bibitem
     end
 
