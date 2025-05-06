@@ -1,0 +1,16 @@
+<bibitem id="CCSDS230.2-G-1" schema-version="v1.2.9">
+  <fetched>2023-08-25</fetched>
+  <title language="en" script="Latn">Next Generation Uplink</title>
+  <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
+  <docidentifier type="CCSDS" primary="true">CCSDS 230.2-G-1</docidentifier>
+  <date type="published">
+    <on>2014-07</on>
+  </date>
+  <edition>1</edition>
+  <abstract language="en" script="Latn">This CCSDS Informational Report discusses a future set (next generation) of telecommand recommendations for space missions.
+
+This document has been reconfirmed by the CCSDS Management Council through June 2024.</abstract>
+  <status>
+    <stage>published</stage>
+  </status>
+</bibitem>
