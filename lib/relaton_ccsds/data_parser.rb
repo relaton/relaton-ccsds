@@ -73,9 +73,8 @@ module RelatonCcsds
     end
 
     def parse_link
-      l = "#{DOMAIN}#{@doc['FileRef']}"
-      t = File.extname(@doc["FileRef"])&.sub(/^\./, "")
-      [RelatonBib::TypedUri.new(type: t, content: l)]
+      /href="(?<content>https:[^"]+)/ =~ @doc[0]
+      [RelatonBib::TypedUri.new(type: "pdf", content: content)]
     end
 
     def parse_edition
