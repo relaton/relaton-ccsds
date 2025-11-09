@@ -1,21 +1,6 @@
 module Relaton
   module Ccsds
     class DataFetcher < Relaton::Core::DataFetcher
-      ACTIVE_PUBS_URL = <<~URL.freeze
-        https://public.ccsds.org/_api/web/lists/getbytitle('CCSDS%20Publications')/items?$top=1000&$select=Dcoument_x0020_Title,
-        Document_x0020_Number,Book_x0020_Type,Issue_x0020_Number,calPublishedMonth,calPublishedYear,Description0,Working_x0020_Group,
-        FileRef,ISO_x0020_Number,Patents,Extra_x0020_Link,Area,calActive,calHtmlColorCode&$filter=Book_x0020_Type%20eq%20%27Blue%20
-        Book%27%20or%20Book_x0020_Type%20eq%20%27Magenta%20Book%27%20or%20Book_x0020_Type%20eq%20%27Green%20Book%27%20or%20
-        Book_x0020_Type%20eq%20%27Orange%20Book%27%20or%20Book_x0020_Type%20eq%20%27Yellow%20Book%20-%20Reports%20and%20Records%27%20
-        or%20Book_x0020_Type%20eq%20%27Yellow%20Book%20-%20CCSDS%20Normative%20Procedures%27
-      URL
-
-      OBSOLETE_PUBS_URL = <<~URL.freeze
-        https://public.ccsds.org/_api/web/lists/getbytitle('CCSDS%20Publications')/items?$top=1000&$select=Dcoument_x0020_Title,
-        Document_x0020_Number,Book_x0020_Type,Issue_x0020_Number,calPublishedMonth,calPublishedYear,Description0,Working_x0020_Group,
-        FileRef,ISO_x0020_Number,Patents,Extra_x0020_Link,Area,calHtmlColorCode&$filter=Book_x0020_Type%20eq%20%27Silver%20Book%27
-      URL
-
       TRRGX = /\s-\s\w+\sTranslated$/
 
       def agent
@@ -33,10 +18,7 @@ module Relaton
       end
 
       def fetch(_source = nil)
-        fetch_docs "https://ccsds.org/publications/bluebooks/"
-        fetch_docs "https://ccsds.org/publications/magentabooks/"
-        fetch_docs "https://ccsds.org/publications/greenbooks/"
-        fetch_docs OBSOLETE_PUBS_URL, retired: true
+        fetch_docs "https://ccsds.org/publications/ccsdsallpubs/"
         index.save
       end
 
@@ -44,31 +26,39 @@ module Relaton
       # Fetch documents from url
       #
       # @param [String] url
-      # @param [Boolean] retired if true, then fetch retired documents
       #
       # @return [void]
       #
-      def fetch_docs(url, retired: false)
+      def fetch_docs(url)
         resp = agent.get(url)
         json = JSON.parse resp.body.match(/const config = (.*);/)[1]
-        @array = json["data"].map do |doc|
-          parse_and_save doc, json["data"], retired
-        end
+        @array = json["data"].map { |doc| parse_and_save doc, json["data"] }
       end
 
       #
       # Parse document and save to file
       #
       # @param [Hash] doc document data
-      # @param [Array<Hash>] results collection of documents
-      # @param [Boolean] retired if true then document is retired
+      # @param [Array<Array<String>>] data collection of documents
+      #   0 - empty
+      #   1 - center/a HTML element with href to PDF
+      #   2 - a HTML element with href to HTML and document ID content (e.g. "CCSDS 123.0-B-1")
+      #   3 - document title
+      #   4 - document series (e.g. "Blue Book", "Silver Book", etc)
+      #   5 - issue number
+      #   6 - publication date (e.g. "August 2020")
+      #   7 - abstract
+      #   8 - Working Group as `{WG name} <a href="{path}" ...`
+      #   9 - ISO Equivalent as `{ISO id} <a href="{uri}" ...`
+      #  10 - Patent Licensing. Some docs has this field. Content is same and looks not useful.
+      #  11 - Extra Information. Looks not useful.
       #
       # @return [void]
       #
-      def parse_and_save(doc, results, retired)
-        bibitem = DataParser.new(doc, results).parse
-        if retired
-          predecessor = DataParser.new(doc, results, bibitem).parse
+      def parse_and_save(doc, data)
+        bibitem = DataParser.new(doc, data).parse
+        if doc[4] == "Silver Book"
+          predecessor = DataParser.new(doc, data, bibitem).parse
           save_bib predecessor
         end
         save_bib bibitem
