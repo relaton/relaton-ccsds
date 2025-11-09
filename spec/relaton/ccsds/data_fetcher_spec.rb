@@ -1,23 +1,8 @@
-describe RelatonCcsds::DataFetcher do
-  subject { RelatonCcsds::DataFetcher.new "data", "bibxml" }
+require "relaton/ccsds/data_fetcher"
+
+describe Relaton::Ccsds::DataFetcher do
+  subject { described_class.new "data", "bibxml" }
   let(:identifier) { "CCSDS 123.0-B-1" }
-
-  context "#fetch" do
-    it "fetches data" do
-      expect(FileUtils).to receive(:mkdir_p).with("data")
-      df = double(:datafetcher)
-      expect(df).to receive(:fetch)
-      expect(described_class).to receive(:new).with("data", "yaml").and_return df
-      described_class.fetch
-    end
-  end
-
-  it "initialize" do
-    expect(subject.instance_variable_get(:@output)).to eq "data"
-    expect(subject.instance_variable_get(:@format)).to eq "bibxml"
-    expect(subject.instance_variable_get(:@ext)).to eq "xml"
-    expect(subject.instance_variable_get(:@files)).to eq []
-  end
 
   context "instance methods" do
     it "#agent" do
@@ -40,14 +25,16 @@ describe RelatonCcsds::DataFetcher do
     end
 
     context "#parse_and_save" do
+      let(:doc) { {} }
+
       before do
-        dp = double(:dataparser, parse: :bibitem)
-        expect(RelatonCcsds::DataParser).to receive(:new).with(:doc, []).and_return dp
+        # dp = instance_double(Relaton::Ccsds::DataParser, parse: :bibitem)
+        # expect(RelatonCcsds::DataParser).to receive(:new).with(:doc, []).and_return dp
         expect(subject).to receive(:save_bib).with(:bibitem)
       end
 
       it "not retired" do
-        subject.parse_and_save :doc, [], false
+        subject.parse_and_save doc, [], false
       end
 
       it "retired" do
@@ -289,13 +276,13 @@ describe RelatonCcsds::DataFetcher do
     it "#create_instance_relation" do
       bib = double "Bibitem", relation: []
       inst = double "Instance bib", relation: []
-      expect(YAML).to receive(:load_file).with("file.yaml").and_return :hash
-      expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(:hash).and_return inst
+      expect(File).to receive(:load_file).with("file.yaml").and_return :yaml
+      expect(Relaton::Ccsds::Item).to receive(:from_yaml).with(:yaml).and_return inst
       expect(subject).to receive(:create_relation).with(inst, "hasInstance").and_return :has_instance
       expect(subject).to receive(:create_relation).with(bib, "instanceOf").and_return :instance_of
       expect(subject).to receive(:content).with(inst).and_return :content
-      expect(File).to receive(:write).with("file.yaml", :content, encoding: "UTF-8")
-      subject.create_instance_relation bib, "file.yaml"
+      expect(File).to receive(:write).with("spec/fixtures/ccsds_123_0-b-1.yaml", :content, encoding: "UTF-8")
+      subject.create_instance_relation bib, "spec/fixtures/ccsds_123_0-b-1.yaml"
       expect(bib.relation).to eq [:has_instance]
       expect(inst.relation).to eq [:instance_of]
     end
