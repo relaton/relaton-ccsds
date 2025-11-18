@@ -1,3 +1,5 @@
+require_relative "data_parser"
+
 module Relaton
   module Ccsds
     class DataFetcher < Relaton::Core::DataFetcher
@@ -77,12 +79,12 @@ module Relaton
       #
       def save_bib(bib) # rubocop:disable Metrics/AbcSize
         search_instance_translation bib
-        file = get_output_file(bib.docidentifier.first.id)
+        file = get_output_file(bib.docidentifier.first.content)
         merge_links bib, file
         File.write file, content(bib), encoding: "UTF-8"
-        index.add_or_update Pubid::Ccsds::Identifier.parse(bib.docidentifier.first.id), file
+        index.add_or_update Pubid::Ccsds::Identifier.parse(bib.docidentifier.first.content), file
       rescue StandardError => e
-        puts "Failed to save #{bib.docidentifier.first.id}: #{e.message}\n#{e.backtrace[0..5].join("\n")}"
+        puts "Failed to save #{bib.docidentifier.first.content}: #{e.message}\n#{e.backtrace[0..5].join("\n")}"
       end
 
       #
@@ -93,7 +95,7 @@ module Relaton
       # @return [void]
       #
       def search_instance_translation(bib)
-        bibid = bib.docidentifier.first.id.dup
+        bibid = bib.docidentifier.first.content.dup
         if bibid.sub!(TRRGX, "")
           search_relations bibid, bib
         else
@@ -113,7 +115,7 @@ module Relaton
         index.search do |row|
           id = row[:id].exclude(:language)
           # TODO: smiplify this line?
-          next if id != bibid || row[:id] == bib.docidentifier.first.id
+          next if id != bibid || row[:id] == bib.docidentifier.first.content
 
           create_relations bib, row[:file]
         end
@@ -138,11 +140,20 @@ module Relaton
       # @return [void]
       #
       def create_relations(bib, file)
-        inst = Item.from_yaml File.read(file, encoding: "UTF-8")
+        inst = parse_file file
         type1, type2 = translation_relation_types(inst)
         bib.relation << create_relation(inst, type1)
         inst.relation << create_relation(bib, type2)
         File.write file, content(inst), encoding: "UTF-8"
+      end
+
+      def parse_file(file)
+        case @format
+        when "yaml" then Item.from_yaml File.read(file, encoding: "UTF-8")
+        when "xml" then Item.from_xml File.read(file, encoding: "UTF-8")
+        else
+          raise RelatonBib::UnknownFormatError, "Unknown format #{@format}"
+        end
       end
 
       #
@@ -153,7 +164,7 @@ module Relaton
       # @return [Array<String>] relation types
       #
       def translation_relation_types(bib)
-        if bib.docidentifier.first.id.match?(TRRGX)
+        if bib.docidentifier.first.content.match?(TRRGX)
           ["hasTranslation"] * 2
         else
           ["instanceOf", "hasInstance"]
@@ -169,9 +180,11 @@ module Relaton
       # @return [void]
       #
       def create_instance_relation(bib, file)
-        inst = Item.from_yaml File.read(file, encoding: "UTf-8")
-        bib.relation << create_relation(inst, "hasInstance")
-        inst.relation << create_relation(bib, "instanceOf")
+        inst = parse_file file
+        rel = create_relation(inst, "hasInstance")
+        bib.relation << rel if rel
+        rel = create_relation(bib, "instanceOf")
+        inst.relation << rel if rel
         File.write file, content(inst), encoding: "UTF-8"
       end
 
@@ -184,7 +197,11 @@ module Relaton
       # @return [Relaton::Bib::Relation] relation
       #
       def create_relation(bib, type)
-        rel = Item.new docidentifier: bib.docidentifier, formattedref: bib.docidentifier.first.content
+        bib_docid = bib.docidentifier.first
+        return unless bib_docid
+
+        docid = Bib::Docidentifier.from_yaml(bib_docid.to_yaml)
+        rel = Relaton::Bib::ItemBase.new docidentifier: [docid], formattedref: bib_docid.content.dup
         Relaton::Bib::Relation.new(type: type, bibitem: rel)
       end
 
@@ -205,7 +222,7 @@ module Relaton
 
         puts "(#{file}) file already exists. Trying to merge links ..."
 
-        bib2 = Item.from_yaml File.read(file, encoding: "UTF-8")
+        bib2 = parse_file file
         if bib.source[0].type == bib2.source[0].type
           Util.info "links are the same.", key: file
           return
@@ -223,7 +240,7 @@ module Relaton
       #
       def content(bib)
         case @format
-        when "yaml" then bib.to_hash.to_yaml
+        when "yaml" then bib.to_yaml
         when "xml" then bib.to_xml(bibdata: true)
         else bib.send "to_#{@format}"
         end

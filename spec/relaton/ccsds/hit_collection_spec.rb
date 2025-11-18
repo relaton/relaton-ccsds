@@ -1,4 +1,4 @@
-class RelatonCcsds::TestHitCollection < RelatonCcsds::HitCollection
+class Relaton::Ccsds::TestHitCollection < Relaton::Ccsds::HitCollection
   # override default index method to avoid index downloading
   def index
     @index ||= Relaton::Index.find_or_create :ccsds, file: "index-v2.yaml"
@@ -10,7 +10,7 @@ class RelatonCcsds::TestHitCollection < RelatonCcsds::HitCollection
   end
 end
 
-describe RelatonCcsds::HitCollection do
+describe Relaton::Ccsds::HitCollection do
   before { index_rows.each { |k, v| subject.add_to_index(Pubid::Ccsds::Identifier.parse(k.to_s) ,v) } }
 
   let(:index_rows) do
@@ -18,7 +18,7 @@ describe RelatonCcsds::HitCollection do
       "CCSDS 103.0-B-2": "data/CCSDS-103.0-B-2.xml" }
   end
 
-  subject { RelatonCcsds::TestHitCollection.new(id) }
+  subject { Relaton::Ccsds::TestHitCollection.new(id) }
 
   context "#fetch" do
     before { subject.fetch }
@@ -42,7 +42,7 @@ describe RelatonCcsds::HitCollection do
     context "when HTTP error occurs" do
       it "raise RelatonBib::RequestError" do
         expect(subject).to receive(:index).and_raise OpenURI::HTTPError.new("error", nil)
-        expect { subject.fetch }.to raise_error RelatonBib::RequestError
+        expect { subject.fetch }.to raise_error Relaton::RequestError
       end
     end
   end

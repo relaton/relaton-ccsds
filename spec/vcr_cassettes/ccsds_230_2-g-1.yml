@@ -39,31 +39,31 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Github-Request-Id:
-      - C660:75F1C:947EDD:A5F821:67B1212B
+      - CA0C:81B3F:DF839:10A22F:69189D67
       Accept-Ranges:
       - bytes
       Date:
-      - Sat, 15 Feb 2025 23:20:11 GMT
+      - Sat, 15 Nov 2025 15:33:59 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-iad-kjyo7100173-IAD
+      - cache-pdk-kpdk1780086-PDK
       X-Cache:
       - MISS
       X-Cache-Hits:
       - '0'
       X-Timer:
-      - S1739661612.804240,VS0,VE103
+      - S1763220840.616715,VS0,VE69
       Vary:
-      - Authorization,Accept-Encoding,Origin
+      - Authorization,Accept-Encoding
       Access-Control-Allow-Origin:
       - "*"
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - 744a77f9db74c97cd26bda24d0cea340205dfda3
+      - 537a449e2c353172e20fefbb6213c3772e75ed54
       Expires:
-      - Sat, 15 Feb 2025 23:25:11 GMT
+      - Sat, 15 Nov 2025 15:38:59 GMT
       Source-Age:
       - '0'
     body:
@@ -215,7 +215,7 @@ http_interactions:
         Ah4DFAAAAAgA83GZWT2kYA3ZGAAAqMkBAA0AGAAAAAAAAQAAAKSBAAAAAGlu
         ZGV4LXYyLnlhbWxVVAUAA4oTbGd1eAsAAQTpAwAABHYAAABQSwUGAAAAAAEA
         AQBTAAAAIBkAAAAA
-  recorded_at: Sat, 15 Feb 2025 23:20:11 GMT
+  recorded_at: Sat, 15 Nov 2025 15:33:59 GMT
 - request:
     method: get
     uri: https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/data/CCSDS-230-2-G-1.yaml
@@ -228,7 +228,7 @@ http_interactions:
       Accept:
       - "*/*"
       User-Agent:
-      - Mechanize/2.14.0 Ruby/3.3.3p89 (http://github.com/sparklemotion/mechanize/)
+      - Mechanize/2.14.0 Ruby/3.4.7p58 (http://github.com/sparklemotion/mechanize/)
       Accept-Language:
       - en-us,en;q=0.5
       Host:
@@ -263,33 +263,33 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Github-Request-Id:
-      - 6578:3B828A:98ADBB:AA2720:67B1212B
+      - C8F3:324078:A631A5:C10982:69189D66
       Content-Encoding:
       - gzip
       Accept-Ranges:
       - bytes
       Date:
-      - Sat, 15 Feb 2025 23:20:12 GMT
+      - Sat, 15 Nov 2025 15:33:59 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-iad-kjyo7100161-IAD
+      - cache-pdk-kpdk1780030-PDK
       X-Cache:
       - MISS
       X-Cache-Hits:
       - '0'
       X-Timer:
-      - S1739661612.281954,VS0,VE96
+      - S1763220840.880540,VS0,VE59
       Vary:
-      - Authorization,Accept-Encoding,Origin
+      - Authorization,Accept-Encoding
       Access-Control-Allow-Origin:
       - "*"
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - 240556b3b4ad6eea5fb9f8f096d7b97ea5ddbb4e
+      - 7145a8f8ed1099bafce8713e2d3fbb3ed16c2700
       Expires:
-      - Sat, 15 Feb 2025 23:25:12 GMT
+      - Sat, 15 Nov 2025 15:38:59 GMT
       Source-Age:
       - '0'
     body:
@@ -306,5 +306,5 @@ http_interactions:
         e23grS9OGcvN6Ms0w7fiiE33j91bXgBrSRlzSRXIpwvFLf37QnikdhjfVtVA
         l6XFlh0X6op8NGgnVhguNztcGHLYH+TT7rm+BVKz89ZP598YCbnVYtrzQ4QD
         xZNRHP5n7oh/D0+9bC4DAAA=
-  recorded_at: Sat, 15 Feb 2025 23:20:12 GMT
+  recorded_at: Sat, 15 Nov 2025 15:33:59 GMT
 recorded_with: VCR 6.3.1

@@ -1,21 +1,23 @@
-module RelatonCcsds
-  class Hit
-    attr_reader :code
+module Relaton
+  module Ccsds
+    class Hit
+      attr_reader :code
 
-    def initialize(code:, url:)
-      @code = code
-      @url = url
-    end
+      def initialize(code:, url:)
+        @code = code
+        @url = url
+      end
 
-    def doc
-      return @doc if @doc
+      def item
+        return @item if @item
 
-      resp = Mechanize.new.get(@url)
-      hash = YAML.safe_load(resp.body)
-      hash["fetched"] = Date.today.to_s
-      @doc = BibliographicItem.from_hash(hash)
-    rescue Mechanize::Error => e
-      raise RelatonBib::RequestError, e.message
+        resp = Mechanize.new.get(@url)
+        @item = Item.from_yaml(resp.body)
+        @item.fetched = Date.today.to_s
+        @item
+      rescue Mechanize::Error => e
+        raise Relaton::RequestError, e.message
+      end
     end
   end
 end

@@ -1,10 +1,10 @@
 ---
 id: CCSDS 123.0-B-1
-format: text/plain
-link:
+type: standard
+source:
 - content: https://public.ccsds.org/Pubs/123x0b1.pdf
   type: pdf
-docid:
-- id: CCSDS 123.0-B-1
+docidentifier:
+- content: CCSDS 123.0-B-1
   type: CCSDS
-primary: true
+  primary: true

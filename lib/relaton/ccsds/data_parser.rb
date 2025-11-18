@@ -38,7 +38,7 @@ module Relaton
       end
 
       def parse_title
-        t = @doc["Dcoument_x0020_Title"]
+        t = @doc[3]
         [Bib::Title.new(content: t, language: "en", script: "Latn")]
       end
 
@@ -47,7 +47,7 @@ module Relaton
       end
 
       def docidentifier(id = nil)
-        id ||= @doc["Document_x0020_Number"].strip
+        id ||= @doc[2].strip
         docid = ID_MAPPING[id] || id
         return docid unless @successor
 
@@ -55,17 +55,17 @@ module Relaton
       end
 
       def parse_abstract
-        a = @doc["Description0"]
+        a = @doc[7]
         [Bib::LocalizedMarkedUpString.new(content: a, language: "en", script: "Latn")]
       end
 
       def parse_doctype
-        /^CCSDS\s[\d.]+-(?<type>\w+)/ =~ @doc["Document_x0020_Number"]
+        />CCSDS\s[\d.]+-(?<type>\w+)/ =~ @doc[2]
         Doctype.new content: DOCTYPES[type&.to_sym]
       end
 
       def parse_date
-        at = "#{@doc['calPublishedMonth']} #{@doc['calPublishedYear']}"
+        at = @doc[6]
         [Bib::Date.new(type: "published", at: at)]
       end
 
@@ -75,34 +75,47 @@ module Relaton
       end
 
       def parse_source
-        l = "#{DOMAIN}#{@doc['FileRef']}"
-        t = File.extname(@doc["FileRef"])&.sub(/^\./, "")
-        [Bib::Uri.new(type: t, content: l)]
+        sources = []
+        src = create_source(@doc[2], "src")
+        sources << src if src
+
+        pdf = create_source(@doc[1], "pdf")
+        sources << pdf if pdf
+
+        sources
+      end
+
+      def create_source(link, type)
+        /(?<href>https?:[^"]+)/ =~ link
+        return unless href
+
+        Bib::Uri.new(type: type, content: href)
       end
 
       def parse_edition
-        ed = @doc["Issue_x0020_Number"].match(/^\d+/)
-        return unless ed
+        return unless @doc[5]
 
-        Bib::Edition.new content: ed.to_s
+        Bib::Edition.new content: @doc[5]
       end
 
       def parse_relation
-        @docs.each_with_object(successors + adopted) do |d, a|
-          id = docidentifier d["Document_x0020_Number"].strip
-          type = relation_type id
-          next unless type
+        successors + adopted
+        # @docs.each_with_object(successors + adopted) do |d, a|
+        #   id = docidentifier d["Document_x0020_Number"].strip
+        #   type = relation_type id
+        #   next unless type
 
-          a << create_relation(type, id)
-        end
+        #   a << create_relation(type, id)
+        # end
       end
 
       def adopted
-        return [] unless @doc["ISO_x0020_Number"]
-
-        code = @doc["ISO_x0020_Number"]["Description"].match(/(?<=\s)\d+$/)
-        id = "ISO #{code}"
-        [create_relation("adoptedAs", id)]
+        /(?<href>https?:[^"]+)/ =~ @doc[9]
+        array(href).map do |uri|
+          iso_doc = Mechanize.new.get(uri)
+          iso_id = iso_doc.at("//h1/span[1]").text.strip
+          create_relation("adoptedAs", iso_id, uri)
+        end
       end
 
       def successors
@@ -112,7 +125,7 @@ module Relaton
           if @successor.relation.none? { |r| r.type == "successorOf" }
             @successor.relation << create_relation("successorOf", docidentifier)
           end
-          [create_relation("hasSuccessor", @successor.docidentifier[0].id)]
+          [create_relation("hasSuccessor", @successor.docidentifier[0].content)]
         end
       end
 
@@ -128,21 +141,25 @@ module Relaton
         end
       end
 
-      def create_relation(type, rel_id)
+      def create_relation(type, rel_id, uri = nil)
         id = Bib::Docidentifier.new content: rel_id, type: "CCSDS", primary: true
-        bibitem = Bib::ItemData.new docidentifier: [id], formattedref: rel_id
+        source = array(uri).map { |u| Bib::Uri.new(type: "src", content: u) }
+        bibitem = Bib::ItemData.new docidentifier: [id], source: source, formattedref: rel_id
         Bib::Relation.new type: type, bibitem: bibitem
       end
 
-      def parse_contributor
-        array(@doc.dig("Working_x0020_Group", "Description")).map do |name|
-          sdname = Bib::TypedLocalizedString.new content: name
+      def parse_contributor # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+        array(@doc[8]).each_with_object([]) do |wg, acc|
+          /^(?<name>[^<]+)/ =~ wg
+          next if name.nil? || name.strip.empty?
+
+          sdname = Bib::TypedLocalizedString.new content: name.strip
           subdiv = Bib::Subdivision.new type: "technical-committee", name: [sdname]
           orgname = Bib::TypedLocalizedString.new content: "CCSDS"
           org = Bib::Organization.new name: [orgname], subdivision: [subdiv]
           description = Bib::LocalizedMarkedUpString.new(content: "committee")
           role = Bib::Contributor::Role.new type: "author", description: [description]
-          Bib::Contributor.new(role: [role], organization: org)
+          acc << Bib::Contributor.new(role: [role], organization: org)
         end
       end
 
@@ -151,10 +168,8 @@ module Relaton
       end
 
       def parse_technology_area
-        desc = @doc.dig("Working_x0020_Group", "Description")
-        return unless desc
-
-        AREAS[desc.match(/^[A-Z]+(?=-)/)&.to_s]
+        desc = @doc[8].split.first
+        AREAS[desc]
       end
     end
   end

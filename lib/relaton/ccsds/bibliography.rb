@@ -30,13 +30,13 @@ module Relaton
         opts[:format] ||= Regexp.last_match(1)
         Util.info "Fetching from Relaton repository ...", key: reference
         hits = search ref
-        doc = hits.first&.doc&.to_format(opts[:format])
-        unless doc
+        item = hits.first&.item&.to_format(opts[:format])
+        unless item
           Util.info "Not found.", key: reference
           return nil
         end
         Util.info "Found: `#{hits.first.code}`.", key: reference
-        doc
+        item
       end
     end
   end

@@ -1,5 +1,5 @@
-describe RelatonCcsds::Hit do
-  subject { RelatonCcsds::Hit.new(code: :id, url: :url) }
+describe Relaton::Ccsds::Hit do
+  subject { Relaton::Ccsds::Hit.new(code: :id, url: :url) }
 
   it "initialize" do
     expect(subject.code).to eq :id
@@ -14,13 +14,13 @@ describe RelatonCcsds::Hit do
       resp = double "response", body: "--- {}\n"
       expect(agent).to receive(:get).with(:url).and_return resp
       hash = { "fetched" => Date.today.to_s }
-      expect(RelatonCcsds::BibliographicItem).to receive(:from_hash).with(hash).and_return :item
+      expect(Relaton::Ccsds::BibliographicItem).to receive(:from_hash).with(hash).and_return :item
       expect(subject.doc).to eq :item
     end
 
     it "raise RelatonBib::RequestError" do
       expect(agent).to receive(:get).with(:url).and_raise Mechanize::Error.new(:response)
-      expect { subject.doc }.to raise_error RelatonBib::RequestError
+      expect { subject.doc }.to raise_error Relaton::RequestError
     end
   end
 end
