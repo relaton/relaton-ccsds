@@ -1,3 +1,8 @@
+require "json"
+require "mechanize"
+require "relaton/index"
+require "pubid/ccsds"
+require_relative "util"
 require_relative "data_parser"
 
 module Relaton
@@ -15,7 +20,7 @@ module Relaton
 
       def index
         @index ||= Relaton::Index.find_or_create(
-          "CCSDS", file: HitCollection::INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
+          "CCSDS", file: Processor::INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
         )
       end
 
@@ -142,8 +147,8 @@ module Relaton
       def create_relations(bib, file)
         inst = parse_file file
         type1, type2 = translation_relation_types(inst)
-        bib.relation << create_relation(inst, type1)
-        inst.relation << create_relation(bib, type2)
+        create_relation(inst, type1) { |rel| bib.relation << rel }
+        create_relation(bib, type2) { |rel| inst.relation << rel }
         File.write file, content(inst), encoding: "UTF-8"
       end
 
@@ -152,7 +157,7 @@ module Relaton
         when "yaml" then Item.from_yaml File.read(file, encoding: "UTF-8")
         when "xml" then Item.from_xml File.read(file, encoding: "UTF-8")
         else
-          raise RelatonBib::UnknownFormatError, "Unknown format #{@format}"
+          raise "Unknown format #{@format}"
         end
       end
 
@@ -181,10 +186,8 @@ module Relaton
       #
       def create_instance_relation(bib, file)
         inst = parse_file file
-        rel = create_relation(inst, "hasInstance")
-        bib.relation << rel if rel
-        rel = create_relation(bib, "instanceOf")
-        inst.relation << rel if rel
+        create_relation(inst, "hasInstance") { |rel| bib.relation << rel }
+        create_relation(bib, "instanceOf") { |rel| inst.relation << rel }
         File.write file, content(inst), encoding: "UTF-8"
       end
 
@@ -201,8 +204,8 @@ module Relaton
         return unless bib_docid
 
         docid = Bib::Docidentifier.from_yaml(bib_docid.to_yaml)
-        rel = Relaton::Bib::ItemBase.new docidentifier: [docid], formattedref: bib_docid.content.dup
-        Relaton::Bib::Relation.new(type: type, bibitem: rel)
+        rel = Relaton::Bib::ItemData.new docidentifier: [docid], formattedref: bib_docid.content.dup
+        yield Relaton::Bib::Relation.new(type: type, bibitem: rel)
       end
 
       #

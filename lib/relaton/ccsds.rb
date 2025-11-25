@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-require "mechanize"
-require "relaton/core"
-require "relaton/bib"
-require "relaton/index"
-require "pubid/ccsds"
+# require "mechanize"
+# require "relaton/core"
+# require "relaton/bib"
+# require "relaton/index"
+# require "pubid/ccsds"
 require_relative "ccsds/version"
+require_relative "ccsds/processor"
 require_relative "ccsds/util"
 require_relative "ccsds/model/item"
 require_relative "ccsds/model/bibitem"

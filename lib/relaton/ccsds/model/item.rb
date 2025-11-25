@@ -1,3 +1,4 @@
+require "relaton/bib"
 require_relative "../item_data"
 require_relative "ext"
 

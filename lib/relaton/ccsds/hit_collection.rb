@@ -2,7 +2,6 @@ module Relaton
   module Ccsds
     class HitCollection < Relaton::Core::HitCollection
       GHURL = "https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/".freeze
-      INDEX_FILE = "index-v1.yaml".freeze
 
       #
       # Search his in index.
@@ -17,7 +16,9 @@ module Relaton
       end
 
       def index
-        @index ||= Relaton::Index.find_or_create :ccsds, url: "#{GHURL}index-v2.zip", file: INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
+        @index ||= Relaton::Index.find_or_create(
+          :ccsds, url: "#{GHURL}index-v2.zip", file: Processor::INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
+        )
       end
 
       def pubid

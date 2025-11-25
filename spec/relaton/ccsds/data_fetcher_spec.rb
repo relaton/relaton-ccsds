@@ -58,9 +58,9 @@ describe Relaton::Ccsds::DataFetcher do
     end
 
     describe "#get_output_file" do
-      subject { described_class.new("data", "bibxml").get_output_file(identifier) }
+      subject { described_class.new("data", "yaml").get_output_file(identifier) }
 
-      it { expect(subject).to eq("data/CCSDS-123-0-B-1.xml") }
+      it { expect(subject).to eq("data/CCSDS-123-0-B-1.yaml") }
     end
 
     context "#save_bib" do
@@ -98,6 +98,7 @@ describe Relaton::Ccsds::DataFetcher do
         let(:translated_identifier) { "#{identifier} - Russian Translated" }
 
         it "adds identifier with translation to identifier's relation" do
+          subject.instance_variable_set(:@format, "yaml")
           subject.save_bib(bib)
           expect(bib.relation.first.bibitem.docidentifier.first.content).to eq(translated_identifier)
         end
@@ -115,6 +116,7 @@ describe Relaton::Ccsds::DataFetcher do
         let(:identifier_without_translation) { "CCSDS 123.0-B-1" }
 
         it "adds identifier without translation to identifier's relation" do
+          subject.instance_variable_set(:@format, "yaml")
           subject.save_bib(bib)
           expect(bib.relation.first.bibitem.docidentifier.first.content).to eq(identifier_without_translation)
         end
@@ -142,7 +144,7 @@ describe Relaton::Ccsds::DataFetcher do
 
     describe "#merge_links" do
       # skip merging when new file
-      let(:data_fetcher) { described_class.new("data", "bibxml") }
+      let(:data_fetcher) { described_class.new("data", "yaml") }
       subject { data_fetcher.merge_links(bib, "spec/fixtures/ccsds_123_0-b-1.yaml") }
 
       let(:yaml) do
@@ -185,13 +187,15 @@ describe Relaton::Ccsds::DataFetcher do
 
     context "#search_instance_translation" do
       it "instance" do
-        bib = double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1")])
+        docid = Relaton::Bib::Docidentifier.new(type: "CCSDS", content: "CCSDS 123.0-B-1")
+        bib = Relaton::Ccsds::ItemData.new(docidentifier: [docid])
         expect(subject).to receive(:search_translations).with("CCSDS 123.0-B-1", bib)
         subject.search_instance_translation bib
       end
 
       it "translation" do
-        bib = double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1 - French Translated")])
+        docid = Relaton::Bib::Docidentifier.new(type: "CCSDS", content: "CCSDS 123.0-B-1 - French Translated")
+        bib = Relaton::Ccsds::ItemData.new(docidentifier: [docid])
         expect(subject).to receive(:search_relations).with "CCSDS 123.0-B-1", bib
         subject.search_instance_translation bib
       end
@@ -199,9 +203,8 @@ describe Relaton::Ccsds::DataFetcher do
 
     context "#search_relations" do
       let(:bibid) { "CCSDS 123.0-B-1" }
-      let(:bib) do
-        double(:bibitem, docidentifier: [double(id: "CCSDS 123.0-B-1 -- Russian Translated")])
-      end
+      let(:docid) { Relaton::Bib::Docidentifier.new(type: "CCSDS", content: "CCSDS 123.0-B-1 -- Russian Translated") }
+      let(:bib) { Relaton::Ccsds::ItemData.new(docidentifier: [docid]) }
 
       it "found instance" do
         expect(subject.index).to receive(:search).and_yield(id: Pubid::Ccsds::Identifier.parse(bibid), file: "file.yaml")
@@ -248,13 +251,12 @@ describe Relaton::Ccsds::DataFetcher do
     end
 
     context "#create_relations" do
-      let(:inst) { Relation::Ccsds::ItemData.new(docidentifier: [docid]) }
-      let(:bib) { Relaton::Ccsds::ItemData.new }
+      let(:docid) { Relaton::Bib::Docidentifier.new(type: "CCSDS", content: "CCSDS 650.0-M-2") }
+      let(:bib) { Relaton::Ccsds::ItemData.new(docidentifier: [docid]) }
 
       before do
         expect(File).to receive(:read).with("file.xml", encoding: "UTF-8").and_return inst_xml
         allow(File).to receive(:read).and_call_original
-        expect(File).to receive(:write).with("file.xml", :xml, encoding: "UTF-8")
       end
 
       context "translation" do
@@ -267,26 +269,31 @@ describe Relaton::Ccsds::DataFetcher do
         end
 
         it do
+          expect(File).to receive(:write).with("file.xml", /hasTranslation/, encoding: "UTF-8")
           subject.create_relations bib, "file.xml"
-          expect(bib.relation).to eq [:has_translation]
-          expect(inst.relation).to eq [:has_translation]
+          expect(bib.relation[0].type).to eq "hasTranslation"
         end
       end
 
       context "instance of" do
-        let(:docid) { double(id: "CCSDS 650.0-M-2") }
+        let(:inst_xml) do
+          <<~XML
+            <bibitem>
+              <docidentifier type="CCSDS">CCSDS 650.0-M-2</docidentifier>
+            </bibitem>
+          XML
+        end
 
         it do
-          expect(subject).to receive(:create_relation).with(inst, "instanceOf").and_return :instance_of
-          expect(subject).to receive(:create_relation).with(bib, "hasInstance").and_return :has_instance
+          expect(File).to receive(:write).with("file.xml", /hasInstance/, encoding: "UTF-8")
           subject.create_relations bib, "file.xml"
-          expect(bib.relation).to eq [:instance_of]
-          expect(inst.relation).to eq [:has_instance]
+          expect(bib.relation[0].type).to eq "instanceOf"
         end
       end
     end
 
     it "#create_instance_relation" do
+      subject.instance_variable_set(:@format, "yaml")
       bib = Relaton::Ccsds::ItemData.new(docidentifier: [Relaton::Bib::Docidentifier.new(content: "CCSDS 123.0-B-1")])
       expect(File).to receive(:write).with("spec/fixtures/ccsds_123_0-b-1.yaml", /instanceOf/, encoding: "UTF-8")
       subject.create_instance_relation bib, "spec/fixtures/ccsds_123_0-b-1.yaml"
@@ -295,14 +302,15 @@ describe Relaton::Ccsds::DataFetcher do
 
     it "#create_relation" do
       docid = Relaton::Bib::Docidentifier.new(type: "CCSDS", content: "CCSDS 123.0-B-1")
-      bib = Relaton::Ccsds::Item.new(docidentifier: [docid])
-      rel = subject.create_relation bib, "hasInstance"
-      expect(rel).to be_instance_of Relaton::Bib::Relation
-      expect(rel.type).to eq "hasInstance"
-      expect(rel.bibitem).to be_instance_of Relaton::Bib::ItemBase
-      expect(rel.bibitem.docidentifier.first.content).to eq "CCSDS 123.0-B-1"
-      expect(rel.bibitem.docidentifier.first.type).to eq "CCSDS"
-      expect(rel.bibitem.formattedref).to eq "CCSDS 123.0-B-1"
+      bib = Relaton::Ccsds::ItemData.new(docidentifier: [docid])
+      subject.create_relation bib, "hasInstance" do |rel|
+        expect(rel).to be_instance_of Relaton::Bib::Relation
+        expect(rel.type).to eq "hasInstance"
+        expect(rel.bibitem).to be_instance_of Relaton::Bib::ItemData
+        expect(rel.bibitem.docidentifier.first.content).to eq "CCSDS 123.0-B-1"
+        expect(rel.bibitem.docidentifier.first.type).to eq "CCSDS"
+        expect(rel.bibitem.formattedref).to eq "CCSDS 123.0-B-1"
+      end
     end
   end
 end

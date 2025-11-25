@@ -1,3 +1,4 @@
+require_relative "model/item"
 require_relative "data_fetcher"
 
 module Relaton
@@ -47,7 +48,7 @@ module Relaton
       end
 
       def docidentifier(id = nil)
-        id ||= @doc[2].strip
+        id ||= @doc[2].strip.match(/(?<=>).+(?=<\/a>)/).to_s
         docid = ID_MAPPING[id] || id
         return docid unless @successor
 
@@ -111,10 +112,36 @@ module Relaton
 
       def adopted
         /(?<href>https?:[^"]+)/ =~ @doc[9]
-        array(href).map do |uri|
-          iso_doc = Mechanize.new.get(uri)
+        array(href).each_with_object([]) do |uri, acc|
+          iso_doc = get_iso_page_with_raite_limit(uri)
+          next unless iso_doc
+
           iso_id = iso_doc.at("//h1/span[1]").text.strip
-          create_relation("adoptedAs", iso_id, uri)
+          acc << create_relation("adoptedAs", iso_id, uri)
+        end
+      end
+
+      def get_iso_page_with_raite_limit(uri)
+        trys = 3
+        begin
+          sleeptime = @prev_request_time ? rand(5..10) - (Time.now - @prev_request_time) : 0
+          sleep(sleeptime) if sleeptime.positive?
+          @prev_request_time = Time.now
+          agent.get(uri)
+        rescue Mechanize::ResponseCodeError => e
+          trys -= 1
+          retry if trys.positive? && [403, 429].include?(e.response_code.to_i)
+          Util.error "Failed to fetch ISO page #{uri}: #{e.message}"
+        rescue Net::HTTPNotFound => e
+          Util.warn "Failed to fetch ISO page #{uri}: #{e.message}"
+        end
+      end
+
+      def agent
+        @agent ||= begin
+          mechanize = Mechanize.new
+          mechanize.user_agent_alias = Mechanize::AGENT_ALIASES.keys.sample
+          mechanize
         end
       end
 

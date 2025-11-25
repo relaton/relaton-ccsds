@@ -1,3 +1,5 @@
+require "relaton/bib/util"
+
 module Relaton
   module Ccsds
     module Util
