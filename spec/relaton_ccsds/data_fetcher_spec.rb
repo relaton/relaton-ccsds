@@ -29,6 +29,7 @@ describe RelatonCcsds::DataFetcher do
       expect(subject).to receive(:fetch_docs).with(/calActive/)
       expect(subject).to receive(:fetch_docs).with(/Silver/, retired: true)
       expect(subject.index).to receive(:save)
+      expect(subject.old_index).to receive(:save)
       subject.fetch
     end
 
