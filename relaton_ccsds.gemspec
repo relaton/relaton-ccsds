@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "mechanize", "~> 2.10"
-  spec.add_dependency "pubid-ccsds", "~> 0.1.6"
+  spec.add_dependency "pubid-ccsds", "~> 1.15.0"
   spec.add_dependency "relaton-bib", "~> 1.20.0"
   spec.add_dependency "relaton-index", "~> 0.2.16"
   # For more information and examples about making a new gem, check out our
