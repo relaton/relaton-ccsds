@@ -2,8 +2,8 @@ require "json"
 require "mechanize"
 require "relaton/index"
 require "pubid/ccsds"
-require_relative "util"
-require_relative "data_parser"
+require_relative "../../ccsds"
+require_relative "parser"
 
 module Relaton
   module Ccsds
@@ -20,7 +20,7 @@ module Relaton
 
       def index
         @index ||= Relaton::Index.find_or_create(
-          "CCSDS", file: Processor::INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
+          "CCSDS", file: INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
         )
       end
 
@@ -226,12 +226,12 @@ module Relaton
         puts "(#{file}) file already exists. Trying to merge links ..."
 
         bib2 = parse_file file
-        if bib.source[0].type == bib2.source[0].type
-          Util.info "links are the same.", key: file
-          return
+        bib2.source.each do |src|
+          next if bib.source.any? { |s| s.type == src.type }
+
+          bib.source << src
         end
         Util.info "links are merged.", key: file
-        bib.source << bib2.source[0]
       end
 
       #

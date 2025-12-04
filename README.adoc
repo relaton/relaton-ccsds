@@ -1,4 +1,4 @@
-= RelatonCcsds
+= Relaton::Ccsds
 
 RelatonCcsds is a Ruby gem that implements the https://github.com/relaton/relaton-models#bibliographic-item[BibliographicItem model].
 
@@ -27,14 +27,23 @@ Or install it yourself as:
 
 [source,ruby]
 ----
-require 'relaton_ccsds'
+require 'relaton/ccsds'
 => true
 
-hits = RelatonCcsds::Bibliography.search("CCSDS 230.2-G-1")
-=> <RelatonCcsds::HitCollection:0x00000000001770 @ref=CCSDS 230.2-G-1 @fetched=false>
+hits = Relaton::Ccsds::Bibliography.search("CCSDS 230.2-G-1")
+=> <Relaton::Ccsds::HitCollection:0x000000000016b0 @ref=CCSDS 230.2-G-1 @fetched=false>
 
-item = hits[0].doc
-=> #<RelatonCcsds::BibliographicItem:0x00000001135f6540
+item = hits[0].item
+=> #<Relaton::Ccsds::ItemData:0x0000000125ae1318
+...
+
+item.docidentifier[0].content
+=> "CCSDS 230.2-G-1"
+
+item = Relaton::Ccsds::Bibliography.get("CCSDS 230.2-G-1")
+[relaton-ccsds] INFO: (CCSDS 230.2-G-1) Fetching from Relaton repository ...
+[relaton-ccsds] INFO: (CCSDS 230.2-G-1) Found: `CCSDS 230.2-G-1`.
+=> #<Relaton::Ccsds::ItemData:0x0000000125deba40
 ...
 ----
 
@@ -43,10 +52,11 @@ item = hits[0].doc
 [source,ruby]
 ----
 item.to_xml
-=> "<bibitem id="CCSDS230.2-G-1" schema-version="v1.2.9">
-      <fetched>2023-08-25</fetched>
-      <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
-      <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
+=> "<bibitem id="CCSDS2302G1" schema-version="v1.4.1">
+      <fetched>2025-12-03</fetched>
+      <title language="en" script="Latn">Next Generation Uplink</title>
+      <uri type="src">https://ccsds.org/publications/ccsdsallpubs/entry/3224/</uri>
+      <uri type="pdf">https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//230x2g1.pdf</uri>
       <docidentifier type="CCSDS" primary="true">CCSDS 230.2-G-1</docidentifier>
       ...
     </bibitem>"
@@ -55,16 +65,13 @@ With argument `bibdata: true` it outputs XML wrapped by `bibdata` element and ad
 [source,ruby]
 ----
 item.to_xml bibdata: true
-=> "<bibdata schema-version="v1.2.9">
-      <fetched>2023-08-25</fetched>
-      <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
-      <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
+=> "<bibdata schema-version="v1.4.1">
+      <fetched>2025-12-03</fetched>
+      <title language="en" script="Latn">Next Generation Uplink</title>
+      <uri type="src">https://ccsds.org/publications/ccsdsallpubs/entry/3224/</uri>
       ...
       <ext>
         <doctype>report</doctype>
-        <editorialgroup>
-          <technical-committee>SLS-NGU</technical-committee>
-        </editorialgroup>
         <technology-area>Space Link Services Area</technology-area>
       </ext>
     </bibdata>"
@@ -76,99 +83,57 @@ All the CCSDS documents have PDF links. Some of them have additional DOC links. 
 
 [source,ruby]
 ----
-item.link
-=> [#<RelatonBib::TypedUri:0x000000011420d950
-  @content=#<Addressable::URI:0xc1c URI:https://public.ccsds.org/Pubs/230x2g1.pdf>,
+item.source
+=> [#<Relaton::Bib::Uri:0x0000000126722b90 @content="https://ccsds.org/publications/ccsdsallpubs/entry/3224/", @language=nil, @locale=nil, @script=nil, @type="src">,
+ #<Relaton::Bib::Uri:0x0000000126722690
+  @content="https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//230x2g1.pdf",
   @language=nil,
+  @locale=nil,
   @script=nil,
   @type="pdf">]
 
-RelatonCcsds::Bibliography.get("CCSDS 720.6-Y-1").link
+Relaton::Ccsds::Bibliography.get("CCSDS 720.6-Y-1").source
 [relaton-ccsds] (CCSDS 720.6-Y-1) Fetching from Relaton repository ...
 [relaton-ccsds] (CCSDS 720.6-Y-1) Found: `CCSDS 720.6-Y-1`.
-=> [#<RelatonBib::TypedUri:0x0000000114183bb0
-  @content=#<Addressable::URI:0xca8 URI:https://public.ccsds.org/Pubs/720x6y1.pdf>,
+=> [#<Relaton::Bib::Uri:0x00000001268cfba0 @content="https://ccsds.org/publications/ccsdsallpubs/entry/3160/", @language=nil, @locale=nil, @script=nil, @type="src">,
+ #<Relaton::Bib::Uri:0x00000001268cf650
+  @content="https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//720x6y1.doc",
   @language=nil,
+  @locale=nil,
   @script=nil,
-  @type="pdf">,
- #<RelatonBib::TypedUri:0x0000000114183750
-  @content=#<Addressable::URI:0xcbc URI:https://public.ccsds.org/Pubs/720x6y1.doc>,
+  @type="doc">,
+ #<Relaton::Bib::Uri:0x00000001268cf100
+  @content="https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//720x6y1.pdf",
   @language=nil,
+  @locale=nil,
   @script=nil,
-  @type="doc">]
-----
-
-=== Get document by code and year
-[source,ruby]
-----
-RelatonCcsds::Bibliography.get("CCSDS 230.2-G-1")
-[relaton-ccsds] (CCSDS 230.2-G-1) Fetching from Relaton repository ...
-[relaton-ccsds] (CCSDS 230.2-G-1) Found: `CCSDS 230.2-G-1`.
-=> #<RelatonCcsds::BibliographicItem:0x00000001135dade0
-...
-----
-
-=== Get specific format
-
-[source,ruby]
-----
-item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (DOC)")
-[relaton-ccsds] (CCSDS 720.4-Y-1 (DOC)) Fetching from Relaton repository ...
-[relaton-ccsds] (CCSDS 720.4-Y-1 (DOC)) Found: `CCSDS 720.4-Y-1`.
-=> #<RelatonCcsds::BibliographicItem:0x000000011100dfe0
-...
-
-item.link.size
-=> 1
-
-item.link[0].type
-=> "doc"
-
-pry(main)> item.link[0].content.to_s
-=> "https://public.ccsds.org/Pubs/720x4y1.doc"
-
-item = RelatonCcsds::Bibliography.get("CCSDS 720.4-Y-1 (PDF)")
-[relaton-ccsds] (CCSDS 720.4-Y-1 (PDF)) Fetching from Relaton repository ...
-[relaton-ccsds] (CCSDS 720.4-Y-1 (PDF)) Found: `CCSDS 720.4-Y-1`.
-=> #<RelatonCcsds::BibliographicItem:0x0000000111004620
-...
-
-item.link.size
-=> 1
-
-item.link[0].type
-=> "pdf"
-
-item.link[0].content.to_s
-=> "https://public.ccsds.org/Pubs/720x4y1.pdf"
+  @type="pdf">]
 ----
 
 === Create bibliographic item from XML
 [source,ruby]
 ----
-RelatonCcsds::XMLParser.from_xml File.read('spec/fixtures/ccsds_230_2-g-1.xml')
-=> #<RelatonCcsds::BibliographicItem:0x00000001135fc1c0
+Relaton::Ccsds::Item.from_xml File.read('spec/fixtures/ccsds_230_2-g-1.xml')
+=> #<Relaton::Ccsds::ItemData:0x0000000127b46680
 ...
 ----
 
 === Create bibliographic item from YAML
 [source,ruby]
 ----
-hash = YAML.load_file 'spec/fixtures/ccsds_230_2-g-1.yaml'
-=> {"schema-version"=>"v1.2.4",
- "id"=>"CCSDS230.2-G-1",
-...
+yaml = File.read 'spec/fixtures/ccsds_230_2-g-1.yaml'
+=> ---\nschema-version: v1.2.9\nid: CCSDS230.2-G-1 ...
 
-RelatonCcsds::BibliographicItem.from_hash hash
-=> #<RelatonCcsds::BibliographicItem:0x00000001135ff780
+Relaton::Ccsds::Item.from_yaml yaml
+=> #<Relaton::Ccsds::ItemData:0x0000000122e4caa0
 ...
 ----
 
 === Fetch data
 
-This gem uses the https://public.ccsds.org/Publications/AllPubs.aspx as a data source.
+This gem uses the https://ccsds.org/publications/ccsdsallpubs/ page as a data source.
 
-The method `RelatonCcsds::DataFetcher.fetch(output: "data", format: "yaml")` fetches all the documents from the data source and saves them to the `./data` folder in YAML format.
+The method `Relaton::Ccsds::DataFetcher.fetch(output: "data", format: "yaml")` fetches all the documents from the data source and saves them to the `./data` folder in YAML format.
 Arguments:
 
 - `output` - folder to save documents (default './data').
@@ -176,11 +141,12 @@ Arguments:
 
 [source,ruby]
 ----
-RelatonCcsds::DataFetcher.fetch
+require 'relaton/ccsds/data/fetcher'
+Relaton::Ccsds::DataFetcher.fetch
 Started at: 2023-08-25 22:02:06 -0400
 (data/CCSDS-720-4-Y-1.yaml) file already exists. Trying to merge links ...
 ...
-Done in: 20 sec.
+Done in: 40 sec.
 => nil
 ----
 

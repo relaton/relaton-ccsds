@@ -1,5 +1,6 @@
-require_relative "model/item"
-require_relative "data_fetcher"
+require_relative "../model/item"
+require_relative "fetcher"
+require_relative "iso_references"
 
 module Relaton
   module Ccsds
@@ -35,7 +36,9 @@ module Relaton
 
       def parse
         args = ATTRS.each_with_object({}) { |a, o| o[a] = send "parse_#{a}" }
-        ItemData.new(**args)
+        item = ItemData.new(**args)
+        item.create_id
+        item
       end
 
       def parse_title
@@ -47,12 +50,16 @@ module Relaton
         [Bib::Docidentifier.new(content: docidentifier, type: "CCSDS", primary: true)]
       end
 
-      def docidentifier(id = nil)
-        id ||= @doc[2].strip.match(/(?<=>).+(?=<\/a>)/).to_s
-        docid = ID_MAPPING[id] || id
-        return docid unless @successor
+      def docidentifier
+        @docidentifier ||= begin
+          docid = parse_identifier(@doc[2])
+          @successor ? docid.sub(/(-S|s)(?=\s|$)/, "") : docid
+        end
+      end
 
-        docid.sub(/(-S|s)(?=\s|$)/, "")
+      def parse_identifier(link)
+        id = link.strip.match(/(?<=>).+(?=<\/a>)/).to_s
+        ID_MAPPING[id] || id
       end
 
       def parse_abstract
@@ -80,17 +87,22 @@ module Relaton
         src = create_source(@doc[2], "src")
         sources << src if src
 
-        pdf = create_source(@doc[1], "pdf")
-        sources << pdf if pdf
+        type = @doc[1].match(/https?:[^"]+(pdf|doc)"/)
+        return sources unless type
 
-        sources
+        download = create_source(@doc[1], type[1])
+        sources.tap { |s| s << download if download }
       end
 
       def create_source(link, type)
-        /(?<href>https?:[^"]+)/ =~ link
+        href = parse_href(link)
         return unless href
 
         Bib::Uri.new(type: type, content: href)
+      end
+
+      def parse_href(link)
+        /(?<href>https?:[^"]+)/.match(link)&.[](:href)
       end
 
       def parse_edition
@@ -100,48 +112,25 @@ module Relaton
       end
 
       def parse_relation
-        successors + adopted
-        # @docs.each_with_object(successors + adopted) do |d, a|
-        #   id = docidentifier d["Document_x0020_Number"].strip
-        #   type = relation_type id
-        #   next unless type
+        @docs.each_with_object(successors + adopted) do |d, a|
+          id = parse_identifier d[2]
+          type = relation_type id
+          next unless type
 
-        #   a << create_relation(type, id)
-        # end
+          a << create_relation(type, id)
+        end
       end
 
       def adopted
         /(?<href>https?:[^"]+)/ =~ @doc[9]
         array(href).each_with_object([]) do |uri, acc|
-          iso_doc = get_iso_page_with_raite_limit(uri)
-          next unless iso_doc
-
-          iso_id = iso_doc.at("//h1/span[1]").text.strip
-          acc << create_relation("adoptedAs", iso_id, uri)
-        end
-      end
-
-      def get_iso_page_with_raite_limit(uri)
-        trys = 3
-        begin
-          sleeptime = @prev_request_time ? rand(5..10) - (Time.now - @prev_request_time) : 0
-          sleep(sleeptime) if sleeptime.positive?
-          @prev_request_time = Time.now
-          agent.get(uri)
-        rescue Mechanize::ResponseCodeError => e
-          trys -= 1
-          retry if trys.positive? && [403, 429].include?(e.response_code.to_i)
-          Util.error "Failed to fetch ISO page #{uri}: #{e.message}"
-        rescue Net::HTTPNotFound => e
-          Util.warn "Failed to fetch ISO page #{uri}: #{e.message}"
-        end
-      end
-
-      def agent
-        @agent ||= begin
-          mechanize = Mechanize.new
-          mechanize.user_agent_alias = Mechanize::AGENT_ALIASES.keys.sample
-          mechanize
+          /\/(?<ref_id>\d+)\.html/ =~ uri
+          iso_id = IsoReferences.instance[ref_id]
+          unless iso_id
+            Util.warn "ISO reference not found for #{uri}"
+            next
+          end
+          acc << create_relation("adoptedAs", iso_id, uri, "ISO")
         end
       end
 
@@ -168,8 +157,8 @@ module Relaton
         end
       end
 
-      def create_relation(type, rel_id, uri = nil)
-        id = Bib::Docidentifier.new content: rel_id, type: "CCSDS", primary: true
+      def create_relation(type, rel_id, uri = nil, id_type = "CCSDS")
+        id = Bib::Docidentifier.new content: rel_id, type: id_type, primary: true
         source = array(uri).map { |u| Bib::Uri.new(type: "src", content: u) }
         bibitem = Bib::ItemData.new docidentifier: [id], source: source, formattedref: rel_id
         Bib::Relation.new type: type, bibitem: bibitem
@@ -195,7 +184,9 @@ module Relaton
       end
 
       def parse_technology_area
-        desc = @doc[8].split.first
+        return unless @doc[8]
+
+        desc = @doc[8].split("-").first
         AREAS[desc]
       end
     end

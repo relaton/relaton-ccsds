@@ -3,8 +3,6 @@ require "relaton/core/processor"
 module Relaton
   module Ccsds
     class Processor < Relaton::Core::Processor
-      INDEX_FILE = "index-v1.yaml".freeze
-
       attr_reader :idtype
 
       def initialize # rubocop:disable Lint/MissingSuper
@@ -33,7 +31,7 @@ module Relaton
       # @option opts [String] :format
       #
       def fetch_data(source = "ccsds", **opts)
-        require_relative "data_fetcher"
+        require_relative "data/fetcher"
         DataFetcher.fetch(source, **opts)
       end
 
@@ -41,7 +39,7 @@ module Relaton
       # @return [Relaton::Ccsds::ItemData]
       def from_xml(xml)
         require_relative "model/item"
-        item.from_xml xml
+        Item.from_xml xml
       end
 
       # @param yaml [String]
@@ -54,7 +52,7 @@ module Relaton
       # Returns hash of XML grammar
       # @return [String]
       def grammar_hash
-        require_relative "ccsds"
+        require_relative "../ccsds"
         @grammar_hash ||= ::Relaton::Ccsds.grammar_hash
       end
 

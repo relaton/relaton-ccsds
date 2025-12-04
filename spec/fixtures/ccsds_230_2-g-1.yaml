@@ -1,43 +1,34 @@
 ---
 schema-version: v1.2.9
-id: CCSDS230.2-G-1
+id: CCSDS2302G1
 title:
 - content: Next Generation Uplink
-  language:
-  - en
-  script:
-  - Latn
-  format: text/plain
-link:
+  language: en
+  script: Latn
+source:
 - content: https://public.ccsds.org/Pubs/230x2g1.pdf
   type: pdf
-docid:
-- id: CCSDS 230.2-G-1
+docidentifier:
+- content: CCSDS 230.2-G-1
   type: CCSDS
   primary: true
 date:
 - type: published
-  value: 2014-07
+  at: 2014-07
 edition:
   content: '1'
-revdate: 2014-07
 abstract:
 - content: |-
     This CCSDS Informational Report discusses a future set (next generation) of telecommand recommendations for space missions.
 
     This document has been reconfirmed by the CCSDS Management Council through June 2024.
-  language:
-  - en
-  script:
-  - Latn
-  format: text/plain
-docstatus:
+  language: en
+  script: Latn
+status:
   stage:
-    value: published
+    content: published
 fetched: '2023-08-25'
 ext:
   technology_area: Space Link Services Area
   doctype:
-    type: report
-  editorialgroup:
-  - name: SLS-NGU
+    content: report

@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/data/CCSDS-650-0-M-2-French-Translated.yaml
+    uri: https://raw.githubusercontent.com/relaton/relaton-data-ccsds/refs/heads/data-v2/data/CCSDS-650-0-M-2-French-Translated.yaml
     body:
       encoding: US-ASCII
       base64_string: ''
@@ -29,7 +29,7 @@ http_interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '832'
+      - '949'
       Cache-Control:
       - max-age=300
       Content-Security-Policy:
@@ -37,7 +37,7 @@ http_interactions:
       Content-Type:
       - text/plain; charset=utf-8
       Etag:
-      - W/"35bb7a0739ef6858662fbff4e22113df47d912c106f2309d4033300282b61242"
+      - W/"03a8ba003f7420a0688330e8200c98667f6481ce0e85a13187c48a6c8467692d"
       Strict-Transport-Security:
       - max-age=31536000
       X-Content-Type-Options:
@@ -47,23 +47,23 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Github-Request-Id:
-      - 653D:2C8ABC:7F5A71:9242EA:6918B58F
+      - CE72:30BA88:5030F2:650946:69310681
       Content-Encoding:
       - gzip
       Accept-Ranges:
       - bytes
       Date:
-      - Sat, 15 Nov 2025 17:17:04 GMT
+      - Thu, 04 Dec 2025 03:56:51 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-pdk-kpdk1780124-PDK
+      - cache-pdk-kpdk1780143-PDK
       X-Cache:
       - MISS
       X-Cache-Hits:
       - '0'
       X-Timer:
-      - S1763227024.946390,VS0,VE77
+      - S1764820612.770153,VS0,VE52
       Vary:
       - Authorization,Accept-Encoding
       Access-Control-Allow-Origin:
@@ -71,32 +71,35 @@ http_interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - 760eaaada162fa7da932fac260085c4f23318b81
+      - a83948bd228e53b895302c6bc911661c41e15b10
       Expires:
-      - Sat, 15 Nov 2025 17:22:04 GMT
+      - Thu, 04 Dec 2025 04:01:51 GMT
       Source-Age:
       - '0'
     body:
       encoding: ASCII-8BIT
       base64_string: |
-        H4sIAAAAAAAAA6VUvW4jNxDu9ymm8xnIrnQCckD2KsfOAQoi2IjSByPuSGKO
-        SzJDUrC7vEa6dLFwj5Du9k3yJBlyJdm6qErUiOTOzzfffDN1XVdBbanHekcc
-        tLMt7N42s+abSnct3N4u75bvvp4203pRz+oPTFZtf2K0wWCkroo6GmqrGpSz
-        kWxsYeG64dkQdAQ87NfDPrsQeJcYkoXlU4jDc0/gkuSL0P392+/Iaqt3uKFy
-        03btuMcoUODN/c18eV0BGLSbJBatnGsgK39BsfZxfPgBY34aHVuI9Bgn3qC2
-        ldH24xm+bYw+tJOJTyujVaNU6ELjeDN5SKswkVIfp/3szYfrxndrCRmfPLWQ
-        z51TwoiEOvECJ2IEwkgNvOLm6Fxs5eZZ98hPAo8TVZ3Y5GiHBBlN2BavHZok
-        T7Pp21k9fVdRpzMXudBTEVezq4ppV2KcDHEVIqOKZ+Ve3VKMBA8shP6apCek
-        XN+j7Ya90C0N0lZHaQzBCgNB/pgv0r1I3FMAivki8RT5GASEMJ975r2RgGgj
-        DH/8x8YKa/eeLNyMZqYEn7+yyjGpv27gOyOKohBFB8IedkmV72she/gTtQDv
-        EvSXlXekH1616/Mn+JHWNBqIYslk7QDac0AXwBwk2cBCyrIRS+BvnfvYwDwE
-        IXjWwPeZwdwV+PxXI9qEw2SBNCdRLkVbZVImNoAyyHqtVUkSMpmenXcj0xcM
-        pDrr+hVTejx15SuZCPDIUatkNDEoMkkX0m9S3ApOrXQc9oA7UiWwKf2I7I5U
-        Cn+HaDnDg0BgPeyzz5ety9LIIn95eT/idCziKiBLChEO9sPeaMdH6OIFRkw7
-        jRvGPsvrfYGCv7hCR7nMz5N17HQMo56UGp7H6MKTaOHhbt7A1f/ZDzLVIWJM
-        IRvKaQxxGsKXuWQyOM7hcWa1FXuh7D7viZVeaZHH6PzvzTl2c9wg+Xhxi5Qv
-        X26N/DvfHPllrES2DNO6PVidZv5y2AvFyyk7C66Ss3rJ7vMi0Sony/vHsUaz
-        YZf8yKfFXowW9/PFsr67medVR2prnXGbp5+RCeWjDkXzMlDH/svWOZuoBVrh
-        uxfMsCTeSbogo0dY/QM+FTAblQYAAA==
-  recorded_at: Sat, 15 Nov 2025 17:17:03 GMT
+        H4sIAAAAAAAAA51US44bNxDd9ykK3jgG0h9pJGUsGwYmMzGgIMIMoiwDDNhk
+        SWLCJjskWx5llWt4511GyBGyc98kJ0mR3frMBwYSrUQ269WrqvcqTdNEiilc
+        Xi6uFpNxUcyH7y1qvv7JMu0U8ygSx9dYsdsNWieNnsJmkI2yQeKlVzhNUlBM
+        rxq2wimgTgAct7L2U/iB+XDkRnvUdJ4b0d4rBIFg292y3YU8CLVpLDQaFlvn
+        2/sKwTSUyYP454+PzPK13BB0PEm9NLZinkjAV9cXs8WrxFEwjyT8tiYCzvLT
+        lGvvazfNc86dcJmxq7xuSiV5xHDdNVOKLl1OAXabnxXjs/wAV4vll+E+1Gn/
+        NW9qZZhw+cqyjfTb28DV5eN0NDrH8zGfjL45OxuI17xky8mEF68no/F5KcQ4
+        HxbDcV4M8pzaf1dUw/dZSCsMl4Jw5VKiDQUeWMRRAT3OinSeDiGFbmJwMjLo
+        C4hv6VRbWTG7nYK3DSaC3hx7Flvi1jGKEf6wGAzTYpKEhFaWjTcxvzVh2gD7
+        MNb4tbF0ATTRbuZBHfHihC03VSW9R6QP1DGm5e/s+FCzCp+E7EmTlJpSyI10
+        J8DHiAcx8+vZfJFeXcz6Tx1Hj3ytadwqPdJAIff5D9Evhy8TVjpvGff/QdEv
+        3tbvLpFQ4cZSUb81pGwMmZgW7Y5ESzKXWnqSN0LJHMZuhAN5wKOt0AGS0jGS
+        JliOtXfggvLrWhEg0x7aT//THtSf6zoWAHDRPVUwO3kVMLF6lcF3inyJzlPh
+        pBAmGh6/L0lQ7Z9MEnHRQPWsfyP6Y0l+/gt+xCV2BiffowLKCkxHQl8i0xs7
+        i7BzKk17Bt8a82sGM+eowcMMvg8dDCqFz39nNBToNxPQ9BoMpUjNVRMa64Ar
+        ZslDveUjLDW0tqY27pkHoTptqtJic3eYyNckA6iZ9ZI3iuwIHFUjY9MvyAXB
+        pVz6dhfR2QY5qDgPb82+ldS/Hi1kuKH0VrY7inkyuiCNYOTjzZu9yQjCksA6
+        oiQcVrU7JY3dU6coUPRMSEZbqAryehOpsF9MbEc8nDS9BwZhjSThRU1x3t67
+        0CPSws3VLHub1+9+1i8S55lvXLAN/Vv1HjxY4bhELKre4PtNITVFUO3XYZmW
+        spQ05y68I0ILy+LyyWLryD1cg89tikcRj1df+D1cf3jnAxJBx5ePCgk7QEZd
+        x+1hlFltb5lFRktGuqgzEvG+5+T0ByqeM03NqQgKFmg3BORI7siSfwGTvkP7
+        aQcAAA==
+  recorded_at: Thu, 04 Dec 2025 03:56:51 GMT
 recorded_with: VCR 6.3.1

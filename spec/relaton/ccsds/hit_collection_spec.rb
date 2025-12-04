@@ -1,3 +1,5 @@
+require "relaton/ccsds/hit_collection"
+
 class Relaton::Ccsds::TestHitCollection < Relaton::Ccsds::HitCollection
   # override default index method to avoid index downloading
   def index
@@ -26,7 +28,7 @@ describe Relaton::Ccsds::HitCollection do
     let(:id) { "CCSDS 103.0-B-2" }
 
     it "returns matching hit" do
-      expect(subject[0].code).to eq(Pubid::Ccsds::Identifier.parse(id))
+      expect(subject[0].hit[:code]).to eq(Pubid::Ccsds::Identifier.parse(id))
     end
 
     context "when reference without edition" do
@@ -34,7 +36,7 @@ describe Relaton::Ccsds::HitCollection do
       let(:id) { "CCSDS 103.0-B" }
 
       it "returns identifiers related to reference" do
-        expect(subject.map(&:code).map(&:to_s)).to eq(match_identifiers)
+        expect(subject.map { _1.hit[:code] }.map(&:to_s)).to eq(match_identifiers)
       end
     end
 

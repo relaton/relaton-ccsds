@@ -1,4 +1,4 @@
-require "relaton/ccsds/data_parser"
+require "relaton/ccsds/data/parser"
 
 describe Relaton::Ccsds::DataParser do
   it ".initialize" do
@@ -16,13 +16,16 @@ describe Relaton::Ccsds::DataParser do
     context "#parse" do
       subject { described_class.new(doc, docs).parse }
 
+      before { allow(Relaton::Ccsds::IsoReferences.instance).to receive(:[]).with("62314").and_return("ISO 15887") }
+
       it { is_expected.to be_a(Relaton::Ccsds::ItemData) }
+      it { expect(subject.id).to eq("CCSDS1210B3") }
       it { expect(subject.docidentifier.first.content).to eq(identifier) }
       it { expect(subject.title.first.content).to eq("Lossless Data Compression") }
       it { expect(subject.ext.doctype.content).to eq("standard") }
       it { expect(subject.date.first.at.to_s).to eq("2020-08") }
       it { expect(subject.status.stage.content).to eq("published") }
-      it { expect(subject.source.first.content.to_s).to eq("https://public.ccsds.org/Pubs/121x0b3.pdf") }
+      it { expect(subject.source.first.content.to_s).to eq("https://ccsds.org/publications/ccsdsallpubs/entry/3215/") }
       it { expect(subject.edition.content).to eq("3") }
       it { expect(subject.relation.first.bibitem.docidentifier.first.content).to eq("ISO 15887") }
       it { expect(subject.contributor[0].organization.subdivision[0].name[0].content).to eq("SLS-MHDC") }
@@ -54,11 +57,12 @@ describe Relaton::Ccsds::DataParser do
         expect(subject.docidentifier).to eq identifier
       end
 
-      it "predecessor" do
-        subject.instance_variable_set :@successor, :doc
-        doc = subject.instance_variable_get :@doc
-        doc["Document_x0020_Number"] = "CCSDS 713.5-B-1-S Cor. 1"
-        expect(subject.docidentifier).to eq "CCSDS 713.5-B-1 Cor. 1"
+      context "predecessor" do
+        let(:doc) { JSON.parse File.read "spec/fixtures/doc_predecessor.json" }
+        it "remove -S from identifier" do
+          subject.instance_variable_set :@successor, :doc
+          expect(subject.docidentifier).to eq "CCSDS 713.5-B-1 Cor. 1"
+        end
       end
     end
 
@@ -103,10 +107,12 @@ describe Relaton::Ccsds::DataParser do
     it "#parse_source" do
       source = subject.parse_source
       expect(source).to be_instance_of Array
-      expect(source.size).to eq 1
-      expect(source.first).to be_instance_of Relaton::Bib::Uri
-      expect(source.first.type).to eq "pdf"
-      expect(source.first.content.to_s).to eq "https://public.ccsds.org/Pubs/121x0b3.pdf"
+      expect(source.size).to eq 2
+      expect(source[0]).to be_instance_of Relaton::Bib::Uri
+      expect(source[0].type).to eq "src"
+      expect(source[0].content.to_s).to eq "https://ccsds.org/publications/ccsdsallpubs/entry/3215/"
+      expect(source[1].type).to eq "pdf"
+      expect(source[1].content.to_s).to eq "https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//121x0b3.pdf"
     end
 
     context "#parse_edition" do
@@ -124,32 +130,42 @@ describe Relaton::Ccsds::DataParser do
       end
 
       it do
+        expect(Relaton::Ccsds::IsoReferences.instance).to receive(:[]).with("62319").and_return("ISO 18381")
         relation = subject.parse_relation
         expect(relation).to be_instance_of Array
         expect(relation.size).to eq 2
         expect(relation[0]).to be_instance_of Relaton::Bib::Relation
         expect(relation[0].type).to eq "adoptedAs"
+        expect(relation[0].bibitem.docidentifier[0].content).to eq "ISO 18381"
         expect(relation[1]).to be_instance_of Relaton::Bib::Relation
         expect(relation[1].type).to eq "updatedBy"
         expect(relation[1].bibitem.docidentifier[0].content).to eq "CCSDS 123.0-B-2 Cor. 2"
       end
     end
 
-    context "successor" do
+    context "#adopted" do
+      it do
+        expect(Relaton::Ccsds::IsoReferences.instance).to receive(:[]).with("62314").and_return("ISO 15887")
+        relation = subject.adopted
+        expect(relation).to be_instance_of Array
+        expect(relation.size).to eq 1
+        expect(relation[0]).to be_instance_of Relaton::Bib::Relation
+        expect(relation[0].type).to eq "adoptedAs"
+        expect(relation[0].bibitem.docidentifier[0].content).to eq "ISO 15887"
+      end
+    end
+
+    context "#successors" do
       it "doesn't have successor" do
-        expect(subject.successor).to eq []
+        expect(subject.successors).to eq []
       end
 
       it "has successor" do
-        docid = double "docid", id: :successor_id
-        successor_rel = double "relation"
-        successor = double "successor", docidentifier: [docid], relation: successor_rel
-        expect(successor_rel).to receive(:<<).with(:predecessor)
+        docid = Relaton::Bib::Docidentifier.new content: "CCSDS 121.0-B-3"
+        successor = Relaton::Ccsds::ItemData.new docidentifier: [docid]
         subject.instance_variable_set :@successor, successor
-        expect(subject).to receive(:docidentifier).and_return :docid
-        expect(subject).to receive(:create_relation).with("successorOf", :docid).and_return :predecessor
-        expect(subject).to receive(:create_relation).with("hasSuccessor", :successor_id).and_return :successor
-        expect(subject.successor).to eq [:successor]
+        expect(subject.successors[0].bibitem.docidentifier[0].content).to eq "CCSDS 121.0-B-3"
+        expect(subject.successors[0].type).to eq "hasSuccessor"
       end
     end
 
@@ -161,8 +177,8 @@ describe Relaton::Ccsds::DataParser do
           [doc, doc_edition_of]
         end
 
-        it { expect(subject.relation_type(doc["Document_x0020_Number"])).to be_nil }
-        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "updatedBy" }
+        it { expect(subject.relation_type(subject.parse_identifier(doc[2]))).to be_nil }
+        it { expect(subject.relation_type(subject.parse_identifier(docs[1][2]))).to eq "updatedBy" }
       end
 
       context "editionOf" do
@@ -172,11 +188,11 @@ describe Relaton::Ccsds::DataParser do
           [doc, doc_has_edition]
         end
 
-        it { expect(subject.relation_type(docs[1]["Document_x0020_Number"])).to eq "updates" }
+        it { expect(subject.relation_type(subject.parse_identifier(docs[1][2]))).to eq "updates" }
       end
 
       it "one ID is translation" do
-        expect(subject).to receive(:docidentifier).and_return("CCSDS 650.0-B-1-S").twice
+        allow(subject).to receive(:docidentifier).and_return("CCSDS 650.0-B-1-S")
         expect(subject.relation_type("CCSDS 650.0-B-1-S - French Translated")).to be_nil
       end
 
@@ -210,7 +226,7 @@ describe Relaton::Ccsds::DataParser do
 
       it "has no technology area" do
         doc = subject.instance_variable_get :@doc
-        doc["Working_x0020_Group"] = nil
+        doc[8] = nil
         expect(subject.parse_technology_area).to be_nil
       end
     end

@@ -1,17 +1,18 @@
+require "mechanize"
 module Relaton
   module Ccsds
-    class Hit
-      attr_reader :code
+    class Hit < Relaton::Core::Hit
+      # attr_reader :code
 
-      def initialize(code:, url:)
-        @code = code
-        @url = url
-      end
+      # def initialize(code:, url:)
+      #   @code = code
+      #   @url = url
+      # end
 
       def item
         return @item if @item
 
-        resp = Mechanize.new.get(@url)
+        resp = Mechanize.new.get(hit[:url])
         @item = Item.from_yaml(resp.body)
         @item.fetched = Date.today.to_s
         @item

@@ -1,23 +1,32 @@
-<bibdata schema-version="v1.2.9">
-  <fetched>2023-08-25</fetched>
-  <title format="text/plain" language="en" script="Latn">Next Generation Uplink</title>
-  <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
+<bibdata schema-version="v1.4.1">
+  <fetched>2025-11-27</fetched>
+  <title language="en" script="Latn">Next Generation Uplink</title>
+  <uri type="src">https://ccsds.org/publications/ccsdsallpubs/entry/3224/</uri>
+  <uri type="pdf">https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//230x2g1.pdf</uri>
   <docidentifier type="CCSDS" primary="true">CCSDS 230.2-G-1</docidentifier>
   <date type="published">
     <on>2014-07</on>
   </date>
+  <contributor>
+    <role type="author">
+      <description>committee</description>
+    </role>
+    <organization>
+      <name>CCSDS</name>
+      <subdivision type="technical-committee">
+        <name>SLS-NGU</name>
+      </subdivision>
+    </organization>
+  </contributor>
   <edition>1</edition>
-  <abstract format="text/plain" language="en" script="Latn">This CCSDS Informational Report discusses a future set (next generation) of telecommand recommendations for space missions.
-
-This document has been reconfirmed by the CCSDS Management Council through June 2024.</abstract>
+  <abstract language="en" script="Latn"><p>This CCSDS Informational Report discusses a future set (next generation) of telecommand recommendations for space missions.</p>
+<p>This document has been reconfirmed by the CCSDS Management Council through June 2024.</p>
+</abstract>
   <status>
     <stage>published</stage>
   </status>
   <ext>
     <doctype>report</doctype>
-    <editorialgroup>
-      <technical-committee>SLS-NGU</technical-committee>
-    </editorialgroup>
     <technology-area>Space Link Services Area</technology-area>
   </ext>
 </bibdata>

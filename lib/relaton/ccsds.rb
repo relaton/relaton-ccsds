@@ -3,24 +3,20 @@
 # require "mechanize"
 # require "relaton/core"
 # require "relaton/bib"
-# require "relaton/index"
-# require "pubid/ccsds"
+require "relaton/index"
+require "pubid/ccsds"
 require_relative "ccsds/version"
-require_relative "ccsds/processor"
+# require_relative "ccsds/processor"
 require_relative "ccsds/util"
 require_relative "ccsds/model/item"
 require_relative "ccsds/model/bibitem"
 require_relative "ccsds/model/bibdata"
 require_relative "ccsds/bibliography"
-require_relative "ccsds/hit"
-require_relative "ccsds/hit_collection"
-# require_relative "relaton_ccsds/data_fetcher"
-# require_relative "relaton_ccsds/data_parser"
-# require_relative "relaton_ccsds/hash_converter"
-# require_relative "relaton_ccsds/xml_parser"
 
 module Relaton
   module Ccsds
+    INDEX_FILE = "index-v1.yaml".freeze
+
     class Error < StandardError; end
     # Your code goes here...
 

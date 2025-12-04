@@ -1,4 +1,4 @@
-require "relaton/ccsds/data_fetcher"
+require "relaton/ccsds/data/fetcher"
 
 describe Relaton::Ccsds::DataFetcher do
   subject { described_class.new "data", "xml" }

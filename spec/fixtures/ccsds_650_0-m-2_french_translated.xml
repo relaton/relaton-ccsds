@@ -1,27 +1,37 @@
-<bibdata schema-version="v1.2.9">
-  <fetched>2023-08-31</fetched>
-  <title format="text/plain" language="en" script="Latn">Modèle de référence pour un Système ouvert d’archivage d’information (OAIS)</title>
-  <uri type="pdf">https://public.ccsds.org/Pubs/650x0m2(F).pdf</uri>
+<bibdata schema-version="v1.4.1">
+  <fetched>2025-11-27</fetched>
+  <title language="en" script="Latn">Modèle de référence pour un Système ouvert d’archivage d’information (OAIS)</title>
+  <uri type="src">https://ccsds.org/publications/ccsdsallpubs/entry/3053/</uri>
+  <uri type="pdf">https://ccsds.org/wp-content/uploads/gravity_forms/5-448e85c647331d9cbaf66c096458bdd5/2025/01//650x0m2F.pdf</uri>
   <docidentifier type="CCSDS" primary="true">CCSDS 650.0-M-2 - French Translated</docidentifier>
   <date type="published">
     <on>2012-06</on>
   </date>
+  <contributor>
+    <role type="author">
+      <description>committee</description>
+    </role>
+    <organization>
+      <name>CCSDS</name>
+      <subdivision type="technical-committee">
+        <name>MOIMS-DAI</name>
+      </subdivision>
+    </organization>
+  </contributor>
   <edition>2</edition>
-  <abstract format="text/plain" language="en" script="Latn">Cette Pratique recommandée définit une base commune de termes et de concepts s’appliquant à un Système ouvert d’archivage d’information (OAIS - Open Archival Information System). Elle est la traduction française du modèle de référence CCSDS 650.0-M-2 « Reference Model for an Open Archival Information System (OAIS). Magenta Book. Issue 2. June 2012 ». La version actuelle inclut des clarifications à propos des clarifications de nombreux concepts, en particulier celui d’Authenticité avec l’introduction du concept de Propriété d’information de transformation ; des corrections et améliorations dans les diagrammes ; l’ajout de l’Information de droits d’accès à la PDI. </abstract>
+  <abstract language="en" script="Latn"><p>Cette Pratique recommandée définit une base commune de termes et de concepts s’appliquant à un Système ouvert d’archivage d’information (OAIS - Open Archival Information System). Elle est la traduction française du modèle de référence CCSDS 650.0-M-2 « Reference Model for an Open Archival Information System (OAIS). Magenta Book. Issue 2. June 2012 ». La version actuelle inclut des clarifications à propos des clarifications de nombreux concepts, en particulier celui d’Authenticité avec l’introduction du concept de Propriété d’information de transformation ; des corrections et améliorations dans les diagrammes ; l’ajout de l’Information de droits d’accès à la PDI.</p>
+</abstract>
   <status>
     <stage>published</stage>
   </status>
   <relation type="instanceOf">
     <bibitem>
-      <formattedref format="text/plain">CCSDS 650.0-M-2</formattedref>
+      <formattedref>CCSDS 650.0-M-2</formattedref>
       <docidentifier type="CCSDS" primary="true">CCSDS 650.0-M-2</docidentifier>
     </bibitem>
   </relation>
   <ext>
     <doctype>practice</doctype>
-    <editorialgroup>
-      <technical-committee>MOIMS-DAI</technical-committee>
-    </editorialgroup>
     <technology-area>Mission Operations and Information Management Services Area</technology-area>
   </ext>
 </bibdata>

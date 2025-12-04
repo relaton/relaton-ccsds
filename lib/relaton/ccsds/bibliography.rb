@@ -1,3 +1,5 @@
+require_relative "hit_collection"
+
 module Relaton
   module Ccsds
     module Bibliography
@@ -30,12 +32,12 @@ module Relaton
         opts[:format] ||= Regexp.last_match(1)
         Util.info "Fetching from Relaton repository ...", key: reference
         hits = search ref
-        item = hits.first&.item&.to_format(opts[:format])
+        item = hits.first&.item # &.to_format(opts[:format])
         unless item
           Util.info "Not found.", key: reference
           return nil
         end
-        Util.info "Found: `#{hits.first.code}`.", key: reference
+        Util.info "Found: `#{hits.first.hit[:code]}`.", key: reference
         item
       end
     end

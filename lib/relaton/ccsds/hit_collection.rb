@@ -1,7 +1,9 @@
+require_relative "hit"
+
 module Relaton
   module Ccsds
     class HitCollection < Relaton::Core::HitCollection
-      GHURL = "https://raw.githubusercontent.com/relaton/relaton-data-ccsds/main/".freeze
+      GHURL = "https://raw.githubusercontent.com/relaton/relaton-data-ccsds/refs/heads/data-v2/".freeze
 
       #
       # Search his in index.
@@ -12,12 +14,12 @@ module Relaton
         @array = rows.map { |row| Hit.new code: row[:id], url: "#{GHURL}#{row[:file]}" }
         self
       rescue SocketError, OpenURI::HTTPError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
-        raise RelatonBib::RequestError, e.message
+        raise Relaton::RequestError, e.message
       end
 
       def index
         @index ||= Relaton::Index.find_or_create(
-          :ccsds, url: "#{GHURL}index-v2.zip", file: Processor::INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
+          :ccsds, url: "#{GHURL}index-v1.zip", file: INDEX_FILE, pubid_class: Pubid::Ccsds::Identifier
         )
       end
 

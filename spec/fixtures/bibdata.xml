@@ -1,4 +1,4 @@
-<bibdata schema-version="v1.2.9">
+<bibdata schema-version="v1.4.1">
   <fetched>2023-08-25</fetched>
   <title language="en" script="Latn">Next Generation Uplink</title>
   <uri type="pdf">https://public.ccsds.org/Pubs/230x2g1.pdf</uri>
@@ -15,9 +15,6 @@ This document has been reconfirmed by the CCSDS Management Council through June 
   </status>
   <ext schema-version="v1.0.2">
     <doctype abbreviation="R">report</doctype>
-    <editorialgroup>
-      <technical-committee number="4" type="committee" identifier="NGU" prefix="SLS">SLS-NGU</technical-committee>
-    </editorialgroup>
     <structuredidentifier type="G">
       <agency>CCSDS</agency>
       <class>specification</class>
