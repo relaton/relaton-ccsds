@@ -1,20 +1,7 @@
 module RelatonCcsds
   class DataFetcher
-    ACTIVE_PUBS_URL = <<~URL.freeze
-      https://public.ccsds.org/_api/web/lists/getbytitle('CCSDS%20Publications')/items?$top=1000&$select=Dcoument_x0020_Title,
-      Document_x0020_Number,Book_x0020_Type,Issue_x0020_Number,calPublishedMonth,calPublishedYear,Description0,Working_x0020_Group,
-      FileRef,ISO_x0020_Number,Patents,Extra_x0020_Link,Area,calActive,calHtmlColorCode&$filter=Book_x0020_Type%20eq%20%27Blue%20
-      Book%27%20or%20Book_x0020_Type%20eq%20%27Magenta%20Book%27%20or%20Book_x0020_Type%20eq%20%27Green%20Book%27%20or%20
-      Book_x0020_Type%20eq%20%27Orange%20Book%27%20or%20Book_x0020_Type%20eq%20%27Yellow%20Book%20-%20Reports%20and%20Records%27%20
-      or%20Book_x0020_Type%20eq%20%27Yellow%20Book%20-%20CCSDS%20Normative%20Procedures%27
-    URL
-
-    OBSOLETE_PUBS_URL = <<~URL.freeze
-      https://public.ccsds.org/_api/web/lists/getbytitle('CCSDS%20Publications')/items?$top=1000&$select=Dcoument_x0020_Title,
-      Document_x0020_Number,Book_x0020_Type,Issue_x0020_Number,calPublishedMonth,calPublishedYear,Description0,Working_x0020_Group,
-      FileRef,ISO_x0020_Number,Patents,Extra_x0020_Link,Area,calHtmlColorCode&$filter=Book_x0020_Type%20eq%20%27Silver%20Book%27
-    URL
-
+    ACTIVE_PUBS_URL = "https://ccsds.org/publications/allpubs/".freeze
+    OBSOLETE_PUBS_URL = "https://ccsds.org/publications/silverbooks/".freeze
     TRRGX = /\s-\s\w+\sTranslated$/.freeze
 
     #
@@ -81,8 +68,10 @@ module RelatonCcsds
     #
     def fetch_docs(url, retired: false)
       resp = agent.get(url)
-      json = JSON.parse resp.body
-      @array = json["d"]["results"].map do |doc|
+      script = resp.xpath("//script").find { |s| s.content.include?("window.gvDTglobals.push") }
+      match = script.content.match(/window\.gvDTglobals\.push\((\{.*?\})\)/m)
+      @docs = JSON.parse match[1]
+      @array = json["data"].map do |doc|
         parse_and_save doc, json["d"]["results"], retired
       end
     end
