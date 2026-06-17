@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "csv", "~> 3.3"
   spec.add_dependency "mechanize", "~> 2.10"
-  spec.add_dependency "openssl", "~> 3.3.2"
   spec.add_dependency "pubid-ccsds", "~> 1.15.2"
   spec.add_dependency "relaton-bib", "~> 2.1.0"
   spec.add_dependency "relaton-core", "~> 0.0.9"
